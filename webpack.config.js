@@ -6,7 +6,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require("webpack");
 
 const urlDev = "https://localhost:3000/";
-const urlProd = "https://mail-magic.vercel.app/"; // Updated with actual Vercel URL
+const urlProd = "https://mail-magicplugin-p872js3nd-subhasisnayak270-5522s-projects.vercel.app/"; // Updated with new Vercel URL
 
 async function getHttpsOptions() {
   const httpsOptions = await devCerts.getHttpsServerOptions();

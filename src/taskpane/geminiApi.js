@@ -1,6 +1,8 @@
 // Gemini API utility for suggesting replies
 const GEMINI_API_KEY = "AIzaSyAC6XVMIRh5CzUjqKPu8Y_A19iPCZNfTdc";
 
+const urlProd = "https://mail-magicplugin-p872js3nd-subhasisnayak270-5522s-projects.vercel.app/";
+
 export async function getSuggestedReply(emailBody) {
   const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY;
   const body = {

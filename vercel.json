@@ -11,18 +11,6 @@
   ],
   "rewrites": [
     {
-      "source": "/taskpane/(.*)",
-      "destination": "/taskpane/$1"
-    },
-    {
-      "source": "/commands/(.*)",
-      "destination": "/commands/$1"
-    },
-    {
-      "source": "/assets/(.*)",
-      "destination": "/assets/$1"
-    },
-    {
       "source": "/(.*)",
       "destination": "/$1"
     }

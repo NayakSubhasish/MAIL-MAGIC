@@ -6,7 +6,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require("webpack");
 
 const urlDev = "https://localhost:3000/";
-const urlProd = "https://your-vercel-url.vercel.app/"; // This will be updated after Vercel deployment
+const urlProd = "https://mail-magic.vercel.app/"; // Updated with actual Vercel URL
 
 async function getHttpsOptions() {
   const httpsOptions = await devCerts.getHttpsServerOptions();

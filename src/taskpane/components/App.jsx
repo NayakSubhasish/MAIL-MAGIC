@@ -98,13 +98,50 @@ const App = (props) => {
   let getEmailBody = () => {
     return new Promise((resolve, reject) => {
       if (window.Office && Office.context && Office.context.mailbox && Office.context.mailbox.item) {
-        Office.context.mailbox.item.body.getAsync("text", (result) => {
-          if (result.status === Office.AsyncResultStatus.Succeeded) {
-            resolve(result.value);
-          } else {
-            reject("Failed to get email body.");
-          }
-        });
+        const item = Office.context.mailbox.item;
+        
+        // Check if we're in compose mode or read mode
+        if (item.itemType === Office.MailboxEnums.ItemType.Message) {
+          // For reading emails, get the current email body
+          item.body.getAsync("text", (result) => {
+            if (result.status === Office.AsyncResultStatus.Succeeded) {
+              resolve(result.value);
+            } else {
+              reject("Failed to get email body.");
+            }
+          });
+        } else if (item.itemType === Office.MailboxEnums.ItemType.Appointment) {
+          // For appointments, get the body
+          item.body.getAsync("text", (result) => {
+            if (result.status === Office.AsyncResultStatus.Succeeded) {
+              resolve(result.value);
+            } else {
+              reject("Failed to get appointment body.");
+            }
+          });
+        } else {
+          reject("Unsupported item type.");
+        }
+      } else {
+        reject("Office.js not available or not in Outlook context.");
+      }
+    });
+  };
+
+  // Helper to get conversation thread (previous emails)
+  let getConversationThread = () => {
+    return new Promise((resolve, reject) => {
+      if (window.Office && Office.context && Office.context.mailbox && Office.context.mailbox.item) {
+        const item = Office.context.mailbox.item;
+        
+        // Get conversation thread if available
+        if (item.conversationId) {
+          // For now, we'll use the current item's subject to identify the thread
+          // In a full implementation, you'd query the conversation
+          resolve(`Thread: ${item.subject || 'No subject'}\n\nCurrent email content will be processed.`);
+        } else {
+          resolve("No conversation thread available.");
+        }
       } else {
         reject("Office.js not available or not in Outlook context.");
       }
@@ -118,7 +155,12 @@ const App = (props) => {
     setGeneratedContent("Generating...");
     try {
       const emailBody = await getEmailBody();
-      const prompt = promptTemplate.replace("{emailBody}", emailBody);
+      const conversationThread = await getConversationThread();
+      
+      // Include conversation thread context in the prompt
+      const contextWithThread = `Conversation Context:\n${conversationThread}\n\nCurrent Email:\n${emailBody}`;
+      const prompt = promptTemplate.replace("{emailBody}", contextWithThread);
+      
       console.log("prompt", prompt);
       const reply = await getSuggestedReply(prompt);
       setGeneratedContent(reply);

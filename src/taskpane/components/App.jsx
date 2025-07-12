@@ -86,7 +86,7 @@ const App = (props) => {
     personalize: "Personalize a reply to this email for a sales manager named Jamie, referencing the Q3 report:\n{emailBody}",
     summarize: "Summarize this email in 2 sentences:\n{emailBody}",
     extractActions: "Extract all action items from this email:\n{emailBody}",
-    salesInsights: "Provide insights and urgency analysis for this email:\n{emailBody}",
+    // salesInsights: "Provide insights and urgency analysis for this email:\n{emailBody}",
   });
 
   // Responsive header style
@@ -145,10 +145,10 @@ const App = (props) => {
     setActiveButton('extractActions');
     callGemini(customPrompts.extractActions);
   };
-  const handleSalesInsights = () => {
-    setActiveButton('salesInsights');
-    callGemini(customPrompts.salesInsights);
-  };
+  // const handleSalesInsights = () => {
+  //   setActiveButton('salesInsights');
+  //   callGemini(customPrompts.salesInsights);
+  // };
   const handleSaveTemplate = () => {
     setActiveButton('saveTemplate');
     setTemplates((prev) => [...prev, generatedContent]);
@@ -215,6 +215,7 @@ const App = (props) => {
             Extract Actions
           </Button>
           */}
+          {/*
           <Button 
             appearance={activeButton === 'salesInsights' ? "primary" : "secondary"}
             onClick={handleSalesInsights} 
@@ -223,6 +224,7 @@ const App = (props) => {
           >
           Insights
           </Button>
+          */}
           {/*
           <Button 
             appearance={activeButton === 'saveTemplate' ? "primary" : "secondary"}

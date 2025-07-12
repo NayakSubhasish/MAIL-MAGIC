@@ -46,7 +46,7 @@ const defaultPrompts = {
   personalize: "Personalize a reply to this email for a sales manager named Jamie, referencing the Q3 report:\n{emailBody}",
   summarize: "Summarize this email in 2 sentences:\n{emailBody}",
   extractActions: "Extract all action items from this email:\n{emailBody}",
-  salesInsights: "Provide sales insights and urgency analysis for this email:\n{emailBody}",
+  // salesInsights: "Provide sales insights and urgency analysis for this email:\n{emailBody}",
 };
 
 const PromptConfig = ({ onSavePrompts }) => {
@@ -90,7 +90,7 @@ const PromptConfig = ({ onSavePrompts }) => {
                 <Tab value="personalize">Personalize</Tab>
                 <Tab value="summarize">Summarize</Tab>
                 <Tab value="extractActions">Extract Actions</Tab>
-                <Tab value="salesInsights">Sales Insights</Tab>
+                {/* <Tab value="salesInsights">Sales Insights</Tab> */}
               </TabList>
               <div className={styles.tabContent}>
                 <Label>System Prompt Template</Label>

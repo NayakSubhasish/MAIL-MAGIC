@@ -11,7 +11,7 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    padding: "8px 12px",
+    padding: "8px 0",
     boxSizing: "border-box",
   },
   headerContainer: {
@@ -26,35 +26,38 @@ const useStyles = makeStyles({
   buttonGrid: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
-    gap: "12px",
+    gap: "8px",
     marginTop: "0",
     marginBottom: "16px",
     width: "100%",
     maxWidth: "none",
+    padding: "0 8px",
   },
   contentArea: {
     width: "100%",
     minHeight: "300px",
     background: "#ffffff",
-    borderRadius: "6px",
-    padding: "16px 12px",
+    borderRadius: "0",
+    padding: "16px 8px",
     marginTop: "8px",
     color: "#323130",
     fontSize: "14px",
     lineHeight: "1.5",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+    boxShadow: "none",
     wordBreak: "break-word",
     overflowY: "auto",
     flex: 1,
     display: "flex",
     flexDirection: "column",
     border: "1px solid #e1e1e1",
+    borderLeft: "none",
+    borderRight: "none",
   },
   gridButton: {
     minHeight: "48px",
     fontSize: "14px",
     fontWeight: "600",
-    borderRadius: "6px",
+    borderRadius: "8px",
     border: "1px solid #d1d1d1",
     backgroundColor: "#ffffff",
     color: "#323130",
@@ -281,20 +284,28 @@ const App = (props) => {
         
         {showWriteEmailForm && (
           <div style={{ 
-            padding: '12px 8px', 
+            padding: '16px 8px', 
             borderTop: '1px solid #e1e1e1', 
-            marginTop: '4px',
+            marginTop: '16px',
             backgroundColor: '#fafafa',
-            borderRadius: '6px',
+            borderRadius: '0',
             width: '100%',
             boxSizing: 'border-box'
           }}>
-            <div style={{ marginBottom: '12px' }}>
+            <h3 style={{ 
+              margin: '0 0 20px 0', 
+              fontSize: '18px', 
+              fontWeight: '600',
+              color: '#323130',
+              textAlign: 'center'
+            }}>Write New Email</h3>
+            
+            <div style={{ marginBottom: '16px' }}>
               <label style={{ 
                 display: 'block', 
-                marginBottom: '4px', 
+                marginBottom: '6px', 
                 fontWeight: '600',
-                fontSize: '13px',
+                fontSize: '14px',
                 color: '#323130'
               }}>Description *</label>
               <textarea
@@ -303,11 +314,11 @@ const App = (props) => {
                 onChange={(e) => setEmailForm({...emailForm, description: e.target.value})}
                 style={{
                   width: '100%',
-                  minHeight: '60px',
-                  padding: '8px 6px',
+                  minHeight: '80px',
+                  padding: '10px',
                   border: '1px solid #d1d1d1',
                   borderRadius: '4px',
-                  fontSize: '13px',
+                  fontSize: '14px',
                   fontFamily: 'inherit',
                   resize: 'vertical',
                   boxSizing: 'border-box',
@@ -320,12 +331,12 @@ const App = (props) => {
               />
             </div>
             
-            <div style={{ marginBottom: '12px' }}>
+            <div style={{ marginBottom: '16px' }}>
               <label style={{ 
                 display: 'block', 
-                marginBottom: '4px', 
+                marginBottom: '6px', 
                 fontWeight: '600',
-                fontSize: '13px',
+                fontSize: '14px',
                 color: '#323130'
               }}>Additional Instructions</label>
               <textarea
@@ -334,11 +345,11 @@ const App = (props) => {
                 onChange={(e) => setEmailForm({...emailForm, additionalInstructions: e.target.value})}
                 style={{
                   width: '100%',
-                  minHeight: '40px',
-                  padding: '8px 6px',
+                  minHeight: '60px',
+                  padding: '10px',
                   border: '1px solid #d1d1d1',
                   borderRadius: '4px',
-                  fontSize: '13px',
+                  fontSize: '14px',
                   fontFamily: 'inherit',
                   resize: 'vertical',
                   boxSizing: 'border-box',
@@ -355,14 +366,14 @@ const App = (props) => {
               display: 'grid', 
               gridTemplateColumns: '1fr 1fr', 
               gap: '8px', 
-              marginBottom: '12px' 
+              marginBottom: '20px' 
             }}>
               <div>
                 <label style={{ 
                   display: 'block', 
-                  marginBottom: '4px', 
+                  marginBottom: '6px', 
                   fontWeight: '600',
-                  fontSize: '13px',
+                  fontSize: '14px',
                   color: '#323130'
                 }}>Tone *</label>
                 <select
@@ -370,10 +381,10 @@ const App = (props) => {
                   onChange={(e) => setEmailForm({...emailForm, tone: e.target.value})}
                   style={{
                     width: '100%',
-                    padding: '8px 6px',
+                    padding: '10px',
                     border: '1px solid #d1d1d1',
                     borderRadius: '4px',
-                    fontSize: '13px',
+                    fontSize: '14px',
                     fontFamily: 'inherit',
                     backgroundColor: '#ffffff',
                     boxSizing: 'border-box',
@@ -394,9 +405,9 @@ const App = (props) => {
               <div>
                 <label style={{ 
                   display: 'block', 
-                  marginBottom: '4px', 
+                  marginBottom: '6px', 
                   fontWeight: '600',
-                  fontSize: '13px',
+                  fontSize: '14px',
                   color: '#323130'
                 }}>Point of View *</label>
                 <select
@@ -404,10 +415,10 @@ const App = (props) => {
                   onChange={(e) => setEmailForm({...emailForm, pointOfView: e.target.value})}
                   style={{
                     width: '100%',
-                    padding: '8px 6px',
+                    padding: '10px',
                     border: '1px solid #d1d1d1',
                     borderRadius: '4px',
-                    fontSize: '13px',
+                    fontSize: '14px',
                     fontFamily: 'inherit',
                     backgroundColor: '#ffffff',
                     boxSizing: 'border-box',
@@ -431,11 +442,11 @@ const App = (props) => {
               disabled={loading || !emailForm.description.trim()}
               style={{ 
                 width: '100%',
-                padding: '10px 0',
-                fontSize: '14px',
+                padding: '12px 24px',
+                fontSize: '16px',
                 fontWeight: '600',
                 borderRadius: '4px',
-                minHeight: '40px'
+                minHeight: '44px'
               }}
             >
               {loading ? 'Generating...' : 'Generate Email'}

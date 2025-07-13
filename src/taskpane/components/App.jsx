@@ -315,7 +315,7 @@ const App = (props) => {
                 style={{
                   width: '100%',
                   minHeight: '60px',
-                  padding: '6px',
+                  padding: '6px 4px',
                   border: '1px solid #d1d1d1',
                   borderRadius: '2px',
                   fontSize: '13px',
@@ -346,7 +346,7 @@ const App = (props) => {
                 style={{
                   width: '100%',
                   minHeight: '40px',
-                  padding: '6px',
+                  padding: '6px 4px',
                   border: '1px solid #d1d1d1',
                   borderRadius: '2px',
                   fontSize: '13px',

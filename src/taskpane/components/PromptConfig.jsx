@@ -42,16 +42,9 @@ const useStyles = makeStyles({
 });
 
 const defaultPrompts = {
-  writeEmail: "Write a professional email based on this description: {emailBody}",
-  editEmail: "Edit and improve this email for clarity and professionalism: {emailBody}",
-  respondToEmail: "Generate a professional response to this email: {emailBody}",
-  rewriteEmail: "Rewrite this email to be more professional and clear: {emailBody}",
-  cleanUpEmail: "Clean up and improve the grammar and structure of this email: {emailBody}",
-  summarize: "Summarize this email in 2 sentences:\n{emailBody}",
+  writeEmail: "Write a professional email with the following details:\nDescription: {description}\nAdditional Instructions: {additionalInstructions}\nTone: {tone}\nPoint of View: {pointOfView}",
   suggestReply: "Suggest a professional reply to this email:\n{emailBody}",
-  personalize: "Personalize a reply to this email for a sales manager named Jamie, referencing the Q3 report:\n{emailBody}",
-  extractActions: "Extract all action items from this email:\n{emailBody}",
-  // salesInsights: "Provide sales insights and urgency analysis for this email:\n{emailBody}",
+  summarize: "Summarize this email in 2 sentences:\n{emailBody}",
 };
 
 const PromptConfig = ({ onSavePrompts }) => {
@@ -92,15 +85,8 @@ const PromptConfig = ({ onSavePrompts }) => {
             <div className={styles.root}>
               <TabList selectedValue={selectedTab} onTabSelect={handleTabSelect}>
                 <Tab value="writeEmail">Write Email</Tab>
-                <Tab value="editEmail">Edit Email</Tab>
-                <Tab value="respondToEmail">Respond to Email</Tab>
-                <Tab value="rewriteEmail">Rewrite Email</Tab>
-                <Tab value="cleanUpEmail">Clean-Up Email</Tab>
-                <Tab value="summarize">Summarize</Tab>
                 <Tab value="suggestReply">Suggest Reply</Tab>
-                <Tab value="personalize">Personalize</Tab>
-                <Tab value="extractActions">Extract Actions</Tab>
-                {/* <Tab value="salesInsights">Sales Insights</Tab> */}
+                <Tab value="summarize">Summarize</Tab>
               </TabList>
               <div className={styles.tabContent}>
                 <Label>System Prompt Template</Label>

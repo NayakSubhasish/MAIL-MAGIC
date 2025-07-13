@@ -80,18 +80,18 @@ const App = (props) => {
   const [loading, setLoading] = React.useState(false);
   const [templates, setTemplates] = React.useState([]);
   const [activeButton, setActiveButton] = React.useState(null);
+  const [showWriteEmailForm, setShowWriteEmailForm] = React.useState(false);
+  const [emailForm, setEmailForm] = React.useState({
+    description: "",
+    additionalInstructions: "",
+    tone: "Formal",
+    pointOfView: "Organization perspective"
+  });
   // const [isDarkMode, setIsDarkMode] = React.useState(false); // dark mode temporarily disabled
   const [customPrompts, setCustomPrompts] = React.useState({
     suggestReply: "Suggest a professional reply to this email:\n{emailBody}",
-    personalize: "Personalize a reply to this email for a sales manager named Jamie, referencing the Q3 report:\n{emailBody}",
     summarize: "Summarize this email in 2 sentences:\n{emailBody}",
-    extractActions: "Extract all action items from this email:\n{emailBody}",
-    writeEmail: "Write a professional email based on this description: {emailBody}",
-    editEmail: "Edit and improve this email for clarity and professionalism: {emailBody}",
-    respondToEmail: "Generate a professional response to this email: {emailBody}",
-    rewriteEmail: "Rewrite this email to be more professional and clear: {emailBody}",
-    cleanUpEmail: "Clean up and improve the grammar and structure of this email: {emailBody}",
-    // salesInsights: "Provide insights and urgency analysis for this email:\n{emailBody}",
+    writeEmail: "Write a professional email with the following details:\nDescription: {description}\nAdditional Instructions: {additionalInstructions}\nTone: {tone}\nPoint of View: {pointOfView}",
   });
 
   // Responsive header style
@@ -178,43 +178,40 @@ const App = (props) => {
   // Feature handlers
   const handleSuggestReply = () => {
     setActiveButton('suggestReply');
+    setShowWriteEmailForm(false);
     callGemini(customPrompts.suggestReply);
-  };
-  const handlePersonalize = () => {
-    setActiveButton('personalize');
-    callGemini(customPrompts.personalize);
   };
   const handleSummarize = () => {
     setActiveButton('summarize');
+    setShowWriteEmailForm(false);
     callGemini(customPrompts.summarize);
   };
-  const handleExtractActions = () => {
-    setActiveButton('extractActions');
-    callGemini(customPrompts.extractActions);
-  };
-  // const handleSalesInsights = () => {
-  //   setActiveButton('salesInsights');
-  //   callGemini(customPrompts.salesInsights);
-  // };
   const handleWriteEmail = () => {
     setActiveButton('writeEmail');
-    callGemini(customPrompts.writeEmail);
+    setShowWriteEmailForm(true);
+    setGeneratedContent("");
   };
-  const handleEditEmail = () => {
-    setActiveButton('editEmail');
-    callGemini(customPrompts.editEmail);
-  };
-  const handleRespondToEmail = () => {
-    setActiveButton('respondToEmail');
-    callGemini(customPrompts.respondToEmail);
-  };
-  const handleRewriteEmail = () => {
-    setActiveButton('rewriteEmail');
-    callGemini(customPrompts.rewriteEmail);
-  };
-  const handleCleanUpEmail = () => {
-    setActiveButton('cleanUpEmail');
-    callGemini(customPrompts.cleanUpEmail);
+  const handleGenerateEmail = () => {
+    if (!emailForm.description.trim()) {
+      setGeneratedContent("Please enter a description for the email.");
+      return;
+    }
+    
+    const prompt = customPrompts.writeEmail
+      .replace("{description}", emailForm.description)
+      .replace("{additionalInstructions}", emailForm.additionalInstructions || "None")
+      .replace("{tone}", emailForm.tone)
+      .replace("{pointOfView}", emailForm.pointOfView);
+    
+    setLoading(true);
+    setGeneratedContent("Generating email...");
+    getSuggestedReply(prompt).then(reply => {
+      setGeneratedContent(reply);
+      setLoading(false);
+    }).catch(e => {
+      setGeneratedContent("Error: " + e);
+      setLoading(false);
+    });
   };
   const handleSaveTemplate = () => {
     setActiveButton('saveTemplate');
@@ -255,36 +252,12 @@ const App = (props) => {
             Write Email
           </Button>
           <Button 
-            appearance={activeButton === 'editEmail' ? "primary" : "secondary"}
-            onClick={handleEditEmail} 
+            appearance={activeButton === 'suggestReply' ? "primary" : "secondary"}
+            onClick={handleSuggestReply} 
             disabled={loading}
-            className={activeButton === 'editEmail' ? `${styles.activeButton} ${styles.gridButton}` : styles.gridButton}
+            className={activeButton === 'suggestReply' ? `${styles.activeButton} ${styles.gridButton}` : styles.gridButton}
           >
-            Edit Email
-          </Button>
-          <Button 
-            appearance={activeButton === 'respondToEmail' ? "primary" : "secondary"}
-            onClick={handleRespondToEmail} 
-            disabled={loading}
-            className={activeButton === 'respondToEmail' ? `${styles.activeButton} ${styles.gridButton}` : styles.gridButton}
-          >
-            Respond to Email
-          </Button>
-          <Button 
-            appearance={activeButton === 'rewriteEmail' ? "primary" : "secondary"}
-            onClick={handleRewriteEmail} 
-            disabled={loading}
-            className={activeButton === 'rewriteEmail' ? `${styles.activeButton} ${styles.gridButton}` : styles.gridButton}
-          >
-            Rewrite Email
-          </Button>
-          <Button 
-            appearance={activeButton === 'cleanUpEmail' ? "primary" : "secondary"}
-            onClick={handleCleanUpEmail} 
-            disabled={loading}
-            className={activeButton === 'cleanUpEmail' ? `${styles.activeButton} ${styles.gridButton}` : styles.gridButton}
-          >
-            Clean-Up Email
+            Suggest Reply
           </Button>
           <Button 
             appearance={activeButton === 'summarize' ? "primary" : "secondary"}
@@ -299,6 +272,102 @@ const App = (props) => {
           </div>
           {/* Dark mode toggle disabled for now */}
         </div>
+        
+        {showWriteEmailForm && (
+          <div style={{ padding: '16px', borderTop: '1px solid #e0e0e0', marginTop: '16px' }}>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>Write New Email</h3>
+            
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Description *</label>
+              <textarea
+                placeholder="Describe what you want to write about and who the email is for."
+                value={emailForm.description}
+                onChange={(e) => setEmailForm({...emailForm, description: e.target.value})}
+                style={{
+                  width: '100%',
+                  minHeight: '80px',
+                  padding: '8px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  fontFamily: 'inherit',
+                  resize: 'vertical'
+                }}
+              />
+            </div>
+            
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Additional Instructions</label>
+              <textarea
+                placeholder="Any additional instructions or specific requirements..."
+                value={emailForm.additionalInstructions}
+                onChange={(e) => setEmailForm({...emailForm, additionalInstructions: e.target.value})}
+                style={{
+                  width: '100%',
+                  minHeight: '60px',
+                  padding: '8px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  fontFamily: 'inherit',
+                  resize: 'vertical'
+                }}
+              />
+            </div>
+            
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Tone</label>
+              <select
+                value={emailForm.tone}
+                onChange={(e) => setEmailForm({...emailForm, tone: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  fontFamily: 'inherit'
+                }}
+              >
+                <option value="Formal">Formal</option>
+                <option value="Casual">Casual</option>
+                <option value="Friendly">Friendly</option>
+                <option value="Professional">Professional</option>
+                <option value="Persuasive">Persuasive</option>
+              </select>
+            </div>
+            
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Point of View</label>
+              <select
+                value={emailForm.pointOfView}
+                onChange={(e) => setEmailForm({...emailForm, pointOfView: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  fontFamily: 'inherit'
+                }}
+              >
+                <option value="Organization perspective">Organization perspective</option>
+                <option value="Personal perspective">Personal perspective</option>
+                <option value="Team perspective">Team perspective</option>
+                <option value="Customer perspective">Customer perspective</option>
+              </select>
+            </div>
+            
+            <Button
+              appearance="primary"
+              onClick={handleGenerateEmail}
+              disabled={loading || !emailForm.description.trim()}
+              style={{ width: '100%' }}
+            >
+              Generate Email
+            </Button>
+          </div>
+        )}
         <div
           className={styles.contentArea}
           dangerouslySetInnerHTML={{

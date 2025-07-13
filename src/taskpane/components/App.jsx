@@ -11,7 +11,7 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    padding: "8px 0",
+    padding: "8px 12px",
     boxSizing: "border-box",
   },
   headerContainer: {
@@ -26,38 +26,35 @@ const useStyles = makeStyles({
   buttonGrid: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
-    gap: "8px",
+    gap: "12px",
     marginTop: "0",
     marginBottom: "16px",
     width: "100%",
     maxWidth: "none",
-    padding: "0 8px",
   },
   contentArea: {
     width: "100%",
     minHeight: "300px",
     background: "#ffffff",
-    borderRadius: "0",
-    padding: "16px 8px",
+    borderRadius: "6px",
+    padding: "16px 12px",
     marginTop: "8px",
     color: "#323130",
     fontSize: "14px",
     lineHeight: "1.5",
-    boxShadow: "none",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
     wordBreak: "break-word",
     overflowY: "auto",
     flex: 1,
     display: "flex",
     flexDirection: "column",
     border: "1px solid #e1e1e1",
-    borderLeft: "none",
-    borderRight: "none",
   },
   gridButton: {
     minHeight: "48px",
     fontSize: "14px",
     fontWeight: "600",
-    borderRadius: "8px",
+    borderRadius: "6px",
     border: "1px solid #d1d1d1",
     backgroundColor: "#ffffff",
     color: "#323130",
@@ -284,18 +281,18 @@ const App = (props) => {
         
         {showWriteEmailForm && (
           <div style={{ 
-            padding: '8px 0', 
+            padding: '12px 8px', 
             borderTop: '1px solid #e1e1e1', 
             marginTop: '4px',
             backgroundColor: '#fafafa',
-            borderRadius: '0',
+            borderRadius: '6px',
             width: '100%',
             boxSizing: 'border-box'
           }}>
-            <div style={{ marginBottom: '8px' }}>
+            <div style={{ marginBottom: '12px' }}>
               <label style={{ 
                 display: 'block', 
-                marginBottom: '2px', 
+                marginBottom: '4px', 
                 fontWeight: '600',
                 fontSize: '13px',
                 color: '#323130'
@@ -307,9 +304,9 @@ const App = (props) => {
                 style={{
                   width: '100%',
                   minHeight: '60px',
-                  padding: '6px 4px',
+                  padding: '8px 6px',
                   border: '1px solid #d1d1d1',
-                  borderRadius: '2px',
+                  borderRadius: '4px',
                   fontSize: '13px',
                   fontFamily: 'inherit',
                   resize: 'vertical',
@@ -323,10 +320,10 @@ const App = (props) => {
               />
             </div>
             
-            <div style={{ marginBottom: '8px' }}>
+            <div style={{ marginBottom: '12px' }}>
               <label style={{ 
                 display: 'block', 
-                marginBottom: '2px', 
+                marginBottom: '4px', 
                 fontWeight: '600',
                 fontSize: '13px',
                 color: '#323130'
@@ -338,9 +335,9 @@ const App = (props) => {
                 style={{
                   width: '100%',
                   minHeight: '40px',
-                  padding: '6px 4px',
+                  padding: '8px 6px',
                   border: '1px solid #d1d1d1',
-                  borderRadius: '2px',
+                  borderRadius: '4px',
                   fontSize: '13px',
                   fontFamily: 'inherit',
                   resize: 'vertical',
@@ -357,13 +354,13 @@ const App = (props) => {
             <div style={{ 
               display: 'grid', 
               gridTemplateColumns: '1fr 1fr', 
-              gap: '6px', 
-              marginBottom: '8px' 
+              gap: '8px', 
+              marginBottom: '12px' 
             }}>
               <div>
                 <label style={{ 
                   display: 'block', 
-                  marginBottom: '2px', 
+                  marginBottom: '4px', 
                   fontWeight: '600',
                   fontSize: '13px',
                   color: '#323130'
@@ -373,9 +370,9 @@ const App = (props) => {
                   onChange={(e) => setEmailForm({...emailForm, tone: e.target.value})}
                   style={{
                     width: '100%',
-                    padding: '6px',
+                    padding: '8px 6px',
                     border: '1px solid #d1d1d1',
-                    borderRadius: '2px',
+                    borderRadius: '4px',
                     fontSize: '13px',
                     fontFamily: 'inherit',
                     backgroundColor: '#ffffff',
@@ -397,7 +394,7 @@ const App = (props) => {
               <div>
                 <label style={{ 
                   display: 'block', 
-                  marginBottom: '2px', 
+                  marginBottom: '4px', 
                   fontWeight: '600',
                   fontSize: '13px',
                   color: '#323130'
@@ -407,9 +404,9 @@ const App = (props) => {
                   onChange={(e) => setEmailForm({...emailForm, pointOfView: e.target.value})}
                   style={{
                     width: '100%',
-                    padding: '6px',
+                    padding: '8px 6px',
                     border: '1px solid #d1d1d1',
-                    borderRadius: '2px',
+                    borderRadius: '4px',
                     fontSize: '13px',
                     fontFamily: 'inherit',
                     backgroundColor: '#ffffff',
@@ -434,11 +431,11 @@ const App = (props) => {
               disabled={loading || !emailForm.description.trim()}
               style={{ 
                 width: '100%',
-                padding: '8px 0',
+                padding: '10px 0',
                 fontSize: '14px',
                 fontWeight: '600',
-                borderRadius: '2px',
-                minHeight: '36px'
+                borderRadius: '4px',
+                minHeight: '40px'
               }}
             >
               {loading ? 'Generating...' : 'Generate Email'}

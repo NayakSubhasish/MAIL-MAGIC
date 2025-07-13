@@ -284,28 +284,28 @@ const App = (props) => {
         
         {showWriteEmailForm && (
           <div style={{ 
-            padding: '16px 8px', 
+            padding: '8px 0', 
             borderTop: '1px solid #e1e1e1', 
-            marginTop: '16px',
+            marginTop: '4px',
             backgroundColor: '#fafafa',
             borderRadius: '0',
             width: '100%',
             boxSizing: 'border-box'
           }}>
             <h3 style={{ 
-              margin: '0 0 20px 0', 
-              fontSize: '18px', 
+              margin: '0 0 8px 0', 
+              fontSize: '16px', 
               fontWeight: '600',
               color: '#323130',
               textAlign: 'center'
             }}>Write New Email</h3>
             
-            <div style={{ marginBottom: '16px' }}>
+            <div style={{ marginBottom: '8px' }}>
               <label style={{ 
                 display: 'block', 
-                marginBottom: '6px', 
+                marginBottom: '2px', 
                 fontWeight: '600',
-                fontSize: '14px',
+                fontSize: '13px',
                 color: '#323130'
               }}>Description *</label>
               <textarea
@@ -314,11 +314,11 @@ const App = (props) => {
                 onChange={(e) => setEmailForm({...emailForm, description: e.target.value})}
                 style={{
                   width: '100%',
-                  minHeight: '80px',
-                  padding: '10px',
+                  minHeight: '60px',
+                  padding: '6px',
                   border: '1px solid #d1d1d1',
-                  borderRadius: '4px',
-                  fontSize: '14px',
+                  borderRadius: '2px',
+                  fontSize: '13px',
                   fontFamily: 'inherit',
                   resize: 'vertical',
                   boxSizing: 'border-box',
@@ -331,12 +331,12 @@ const App = (props) => {
               />
             </div>
             
-            <div style={{ marginBottom: '16px' }}>
+            <div style={{ marginBottom: '8px' }}>
               <label style={{ 
                 display: 'block', 
-                marginBottom: '6px', 
+                marginBottom: '2px', 
                 fontWeight: '600',
-                fontSize: '14px',
+                fontSize: '13px',
                 color: '#323130'
               }}>Additional Instructions</label>
               <textarea
@@ -345,11 +345,11 @@ const App = (props) => {
                 onChange={(e) => setEmailForm({...emailForm, additionalInstructions: e.target.value})}
                 style={{
                   width: '100%',
-                  minHeight: '60px',
-                  padding: '10px',
+                  minHeight: '40px',
+                  padding: '6px',
                   border: '1px solid #d1d1d1',
-                  borderRadius: '4px',
-                  fontSize: '14px',
+                  borderRadius: '2px',
+                  fontSize: '13px',
                   fontFamily: 'inherit',
                   resize: 'vertical',
                   boxSizing: 'border-box',
@@ -365,15 +365,15 @@ const App = (props) => {
             <div style={{ 
               display: 'grid', 
               gridTemplateColumns: '1fr 1fr', 
-              gap: '8px', 
-              marginBottom: '20px' 
+              gap: '6px', 
+              marginBottom: '8px' 
             }}>
               <div>
                 <label style={{ 
                   display: 'block', 
-                  marginBottom: '6px', 
+                  marginBottom: '2px', 
                   fontWeight: '600',
-                  fontSize: '14px',
+                  fontSize: '13px',
                   color: '#323130'
                 }}>Tone *</label>
                 <select
@@ -381,10 +381,10 @@ const App = (props) => {
                   onChange={(e) => setEmailForm({...emailForm, tone: e.target.value})}
                   style={{
                     width: '100%',
-                    padding: '10px',
+                    padding: '6px',
                     border: '1px solid #d1d1d1',
-                    borderRadius: '4px',
-                    fontSize: '14px',
+                    borderRadius: '2px',
+                    fontSize: '13px',
                     fontFamily: 'inherit',
                     backgroundColor: '#ffffff',
                     boxSizing: 'border-box',
@@ -405,9 +405,9 @@ const App = (props) => {
               <div>
                 <label style={{ 
                   display: 'block', 
-                  marginBottom: '6px', 
+                  marginBottom: '2px', 
                   fontWeight: '600',
-                  fontSize: '14px',
+                  fontSize: '13px',
                   color: '#323130'
                 }}>Point of View *</label>
                 <select
@@ -415,10 +415,10 @@ const App = (props) => {
                   onChange={(e) => setEmailForm({...emailForm, pointOfView: e.target.value})}
                   style={{
                     width: '100%',
-                    padding: '10px',
+                    padding: '6px',
                     border: '1px solid #d1d1d1',
-                    borderRadius: '4px',
-                    fontSize: '14px',
+                    borderRadius: '2px',
+                    fontSize: '13px',
                     fontFamily: 'inherit',
                     backgroundColor: '#ffffff',
                     boxSizing: 'border-box',
@@ -442,11 +442,11 @@ const App = (props) => {
               disabled={loading || !emailForm.description.trim()}
               style={{ 
                 width: '100%',
-                padding: '12px 24px',
-                fontSize: '16px',
+                padding: '8px 0',
+                fontSize: '14px',
                 fontWeight: '600',
-                borderRadius: '4px',
-                minHeight: '44px'
+                borderRadius: '2px',
+                minHeight: '36px'
               }}
             >
               {loading ? 'Generating...' : 'Generate Email'}

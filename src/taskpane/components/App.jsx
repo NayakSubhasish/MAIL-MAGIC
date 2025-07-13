@@ -11,7 +11,7 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    padding: "8px 4px",
+    padding: "8px 0",
     boxSizing: "border-box",
   },
   headerContainer: {
@@ -30,25 +30,28 @@ const useStyles = makeStyles({
     marginTop: "0",
     marginBottom: "16px",
     width: "100%",
-    maxWidth: "600px",
+    maxWidth: "none",
+    padding: "0 8px",
   },
   contentArea: {
     width: "100%",
     minHeight: "300px",
     background: "#ffffff",
-    borderRadius: "8px",
-    padding: "16px",
+    borderRadius: "0",
+    padding: "16px 8px",
     marginTop: "8px",
     color: "#323130",
     fontSize: "14px",
     lineHeight: "1.5",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+    boxShadow: "none",
     wordBreak: "break-word",
     overflowY: "auto",
     flex: 1,
     display: "flex",
     flexDirection: "column",
     border: "1px solid #e1e1e1",
+    borderLeft: "none",
+    borderRight: "none",
   },
   gridButton: {
     minHeight: "48px",
@@ -285,7 +288,9 @@ const App = (props) => {
             borderTop: '1px solid #e1e1e1', 
             marginTop: '16px',
             backgroundColor: '#fafafa',
-            borderRadius: '8px',
+            borderRadius: '0',
+            width: '100%',
+            boxSizing: 'border-box'
           }}>
             <h3 style={{ 
               margin: '0 0 20px 0', 
@@ -312,7 +317,7 @@ const App = (props) => {
                   minHeight: '80px',
                   padding: '10px',
                   border: '1px solid #d1d1d1',
-                  borderRadius: '6px',
+                  borderRadius: '4px',
                   fontSize: '14px',
                   fontFamily: 'inherit',
                   resize: 'vertical',
@@ -343,7 +348,7 @@ const App = (props) => {
                   minHeight: '60px',
                   padding: '10px',
                   border: '1px solid #d1d1d1',
-                  borderRadius: '6px',
+                  borderRadius: '4px',
                   fontSize: '14px',
                   fontFamily: 'inherit',
                   resize: 'vertical',
@@ -360,7 +365,7 @@ const App = (props) => {
             <div style={{ 
               display: 'grid', 
               gridTemplateColumns: '1fr 1fr', 
-              gap: '12px', 
+              gap: '8px', 
               marginBottom: '20px' 
             }}>
               <div>
@@ -378,7 +383,7 @@ const App = (props) => {
                     width: '100%',
                     padding: '10px',
                     border: '1px solid #d1d1d1',
-                    borderRadius: '6px',
+                    borderRadius: '4px',
                     fontSize: '14px',
                     fontFamily: 'inherit',
                     backgroundColor: '#ffffff',
@@ -412,7 +417,7 @@ const App = (props) => {
                     width: '100%',
                     padding: '10px',
                     border: '1px solid #d1d1d1',
-                    borderRadius: '6px',
+                    borderRadius: '4px',
                     fontSize: '14px',
                     fontFamily: 'inherit',
                     backgroundColor: '#ffffff',
@@ -440,7 +445,7 @@ const App = (props) => {
                 padding: '12px 24px',
                 fontSize: '16px',
                 fontWeight: '600',
-                borderRadius: '6px',
+                borderRadius: '4px',
                 minHeight: '44px'
               }}
             >

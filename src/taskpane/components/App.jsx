@@ -292,14 +292,6 @@ const App = (props) => {
             width: '100%',
             boxSizing: 'border-box'
           }}>
-            <h3 style={{ 
-              margin: '0 0 8px 0', 
-              fontSize: '16px', 
-              fontWeight: '600',
-              color: '#323130',
-              textAlign: 'center'
-            }}>Write New Email</h3>
-            
             <div style={{ marginBottom: '8px' }}>
               <label style={{ 
                 display: 'block', 

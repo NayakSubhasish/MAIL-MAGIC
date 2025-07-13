@@ -76,7 +76,21 @@ const PromptConfig = ({ onSavePrompts }) => {
   return (
     <Dialog open={open} onOpenChange={(e, data) => setOpen(data.open)}>
       <DialogTrigger>
-        <Button appearance="secondary">Configure Prompt</Button>
+        <Button 
+          appearance="secondary" 
+          style={{
+            width: '100%',
+            minHeight: '48px',
+            fontSize: '14px',
+            fontWeight: '600',
+            borderRadius: '8px',
+            border: '1px solid #d1d1d1',
+            backgroundColor: '#ffffff',
+            color: '#323130',
+          }}
+        >
+          Configure Prompt
+        </Button>
       </DialogTrigger>
       <DialogSurface>
         <DialogBody>

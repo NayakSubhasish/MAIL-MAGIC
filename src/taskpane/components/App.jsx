@@ -37,21 +37,20 @@ const useStyles = makeStyles({
     width: "100%",
     minHeight: "300px",
     background: "#ffffff",
-    borderRadius: "0",
-    padding: "16px 8px",
+    borderRadius: "8px",
+    padding: "20px",
     marginTop: "8px",
     color: "#323130",
     fontSize: "14px",
-    lineHeight: "1.5",
-    boxShadow: "none",
+    lineHeight: "1.6",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
     wordBreak: "break-word",
     overflowY: "auto",
     flex: 1,
     display: "flex",
     flexDirection: "column",
     border: "1px solid #e1e1e1",
-    borderLeft: "none",
-    borderRight: "none",
+    margin: "8px 8px 0 8px",
   },
   gridButton: {
     minHeight: "48px",
@@ -276,7 +275,7 @@ const App = (props) => {
           >
             Summarize
           </Button>
-          <div className={styles.gridButton} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }}>
+          <div className={styles.gridButton} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0' }}>
             <PromptConfig onSavePrompts={handleSavePrompts} />
           </div>
           {/* Dark mode toggle disabled for now */}
@@ -362,78 +361,71 @@ const App = (props) => {
               />
             </div>
             
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: '1fr 1fr', 
-              gap: '8px', 
-              marginBottom: '20px' 
-            }}>
-              <div>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '6px', 
-                  fontWeight: '600',
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '6px', 
+                fontWeight: '600',
+                fontSize: '14px',
+                color: '#323130'
+              }}>Tone *</label>
+              <select
+                value={emailForm.tone}
+                onChange={(e) => setEmailForm({...emailForm, tone: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #d1d1d1',
+                  borderRadius: '4px',
                   fontSize: '14px',
-                  color: '#323130'
-                }}>Tone *</label>
-                <select
-                  value={emailForm.tone}
-                  onChange={(e) => setEmailForm({...emailForm, tone: e.target.value})}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #d1d1d1',
-                    borderRadius: '4px',
-                    fontSize: '14px',
-                    fontFamily: 'inherit',
-                    backgroundColor: '#ffffff',
-                    boxSizing: 'border-box',
-                    outline: 'none',
-                    cursor: 'pointer'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#0078d4'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d1d1'}
-                >
-                  <option value="Formal">Formal</option>
-                  <option value="Casual">Casual</option>
-                  <option value="Friendly">Friendly</option>
-                  <option value="Professional">Professional</option>
-                  <option value="Persuasive">Persuasive</option>
-                </select>
-              </div>
-              
-              <div>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '6px', 
-                  fontWeight: '600',
+                  fontFamily: 'inherit',
+                  backgroundColor: '#ffffff',
+                  boxSizing: 'border-box',
+                  outline: 'none',
+                  cursor: 'pointer'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#0078d4'}
+                onBlur={(e) => e.target.style.borderColor = '#d1d1d1'}
+              >
+                <option value="Formal">Formal</option>
+                <option value="Casual">Casual</option>
+                <option value="Friendly">Friendly</option>
+                <option value="Professional">Professional</option>
+                <option value="Persuasive">Persuasive</option>
+              </select>
+            </div>
+            
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '6px', 
+                fontWeight: '600',
+                fontSize: '14px',
+                color: '#323130'
+              }}>Point of View *</label>
+              <select
+                value={emailForm.pointOfView}
+                onChange={(e) => setEmailForm({...emailForm, pointOfView: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #d1d1d1',
+                  borderRadius: '4px',
                   fontSize: '14px',
-                  color: '#323130'
-                }}>Point of View *</label>
-                <select
-                  value={emailForm.pointOfView}
-                  onChange={(e) => setEmailForm({...emailForm, pointOfView: e.target.value})}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #d1d1d1',
-                    borderRadius: '4px',
-                    fontSize: '14px',
-                    fontFamily: 'inherit',
-                    backgroundColor: '#ffffff',
-                    boxSizing: 'border-box',
-                    outline: 'none',
-                    cursor: 'pointer'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#0078d4'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d1d1'}
-                >
-                  <option value="Organization perspective">Organization perspective</option>
-                  <option value="Personal perspective">Personal perspective</option>
-                  <option value="Team perspective">Team perspective</option>
-                  <option value="Customer perspective">Customer perspective</option>
-                </select>
-              </div>
+                  fontFamily: 'inherit',
+                  backgroundColor: '#ffffff',
+                  boxSizing: 'border-box',
+                  outline: 'none',
+                  cursor: 'pointer'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#0078d4'}
+                onBlur={(e) => e.target.style.borderColor = '#d1d1d1'}
+              >
+                <option value="Organization perspective">Organization perspective</option>
+                <option value="Personal perspective">Personal perspective</option>
+                <option value="Team perspective">Team perspective</option>
+                <option value="Customer perspective">Customer perspective</option>
+              </select>
             </div>
             
             <Button
@@ -462,7 +454,7 @@ const App = (props) => {
                   .replace(/\n/g, '<br>') // preserve line breaks
                   .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>') // bold for **text**
                   .replace(/\*(.*?)\*/g, '<i>$1</i>') // italics for *text*
-              : "Generated content will appear here."
+              : '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #605e5c; font-style: italic; text-align: center; padding: 40px;"><div><div style="font-size: 16px; margin-bottom: 8px;">✨ Your generated content will appear here</div><div style="font-size: 12px; opacity: 0.8;">Click a button above to get started</div></div></div>'
           }}
         />
       </div>

@@ -86,6 +86,11 @@ const App = (props) => {
     personalize: "Personalize a reply to this email for a sales manager named Jamie, referencing the Q3 report:\n{emailBody}",
     summarize: "Summarize this email in 2 sentences:\n{emailBody}",
     extractActions: "Extract all action items from this email:\n{emailBody}",
+    writeEmail: "Write a professional email based on this description: {emailBody}",
+    editEmail: "Edit and improve this email for clarity and professionalism: {emailBody}",
+    respondToEmail: "Generate a professional response to this email: {emailBody}",
+    rewriteEmail: "Rewrite this email to be more professional and clear: {emailBody}",
+    cleanUpEmail: "Clean up and improve the grammar and structure of this email: {emailBody}",
     // salesInsights: "Provide insights and urgency analysis for this email:\n{emailBody}",
   });
 
@@ -191,6 +196,26 @@ const App = (props) => {
   //   setActiveButton('salesInsights');
   //   callGemini(customPrompts.salesInsights);
   // };
+  const handleWriteEmail = () => {
+    setActiveButton('writeEmail');
+    callGemini(customPrompts.writeEmail);
+  };
+  const handleEditEmail = () => {
+    setActiveButton('editEmail');
+    callGemini(customPrompts.editEmail);
+  };
+  const handleRespondToEmail = () => {
+    setActiveButton('respondToEmail');
+    callGemini(customPrompts.respondToEmail);
+  };
+  const handleRewriteEmail = () => {
+    setActiveButton('rewriteEmail');
+    callGemini(customPrompts.rewriteEmail);
+  };
+  const handleCleanUpEmail = () => {
+    setActiveButton('cleanUpEmail');
+    callGemini(customPrompts.cleanUpEmail);
+  };
   const handleSaveTemplate = () => {
     setActiveButton('saveTemplate');
     setTemplates((prev) => [...prev, generatedContent]);
@@ -222,23 +247,45 @@ const App = (props) => {
       <div className={styles.root}>
         <div className={styles.buttonGrid}>
           <Button 
-            appearance={activeButton === 'suggestReply' ? "primary" : "secondary"}
-            onClick={handleSuggestReply} 
+            appearance={activeButton === 'writeEmail' ? "primary" : "secondary"}
+            onClick={handleWriteEmail} 
             disabled={loading}
-            className={activeButton === 'suggestReply' ? `${styles.activeButton} ${styles.gridButton}` : styles.gridButton}
+            className={activeButton === 'writeEmail' ? `${styles.activeButton} ${styles.gridButton}` : styles.gridButton}
           >
-            Suggest Reply
+            Write Email
           </Button>
-          {/*
           <Button 
-            appearance={activeButton === 'personalize' ? "primary" : "secondary"}
-            onClick={handlePersonalize} 
+            appearance={activeButton === 'editEmail' ? "primary" : "secondary"}
+            onClick={handleEditEmail} 
             disabled={loading}
-            className={activeButton === 'personalize' ? `${styles.activeButton} ${styles.gridButton}` : styles.gridButton}
+            className={activeButton === 'editEmail' ? `${styles.activeButton} ${styles.gridButton}` : styles.gridButton}
           >
-            Personalize
+            Edit Email
           </Button>
-          */}
+          <Button 
+            appearance={activeButton === 'respondToEmail' ? "primary" : "secondary"}
+            onClick={handleRespondToEmail} 
+            disabled={loading}
+            className={activeButton === 'respondToEmail' ? `${styles.activeButton} ${styles.gridButton}` : styles.gridButton}
+          >
+            Respond to Email
+          </Button>
+          <Button 
+            appearance={activeButton === 'rewriteEmail' ? "primary" : "secondary"}
+            onClick={handleRewriteEmail} 
+            disabled={loading}
+            className={activeButton === 'rewriteEmail' ? `${styles.activeButton} ${styles.gridButton}` : styles.gridButton}
+          >
+            Rewrite Email
+          </Button>
+          <Button 
+            appearance={activeButton === 'cleanUpEmail' ? "primary" : "secondary"}
+            onClick={handleCleanUpEmail} 
+            disabled={loading}
+            className={activeButton === 'cleanUpEmail' ? `${styles.activeButton} ${styles.gridButton}` : styles.gridButton}
+          >
+            Clean-Up Email
+          </Button>
           <Button 
             appearance={activeButton === 'summarize' ? "primary" : "secondary"}
             onClick={handleSummarize} 
@@ -247,46 +294,6 @@ const App = (props) => {
           >
             Summarize
           </Button>
-          {/*
-          <Button 
-            appearance={activeButton === 'extractActions' ? "primary" : "secondary"}
-            onClick={handleExtractActions} 
-            disabled={loading}
-            className={activeButton === 'extractActions' ? `${styles.activeButton} ${styles.gridButton}` : styles.gridButton}
-          >
-            Extract Actions
-          </Button>
-          */}
-          {/*
-          <Button 
-            appearance={activeButton === 'salesInsights' ? "primary" : "secondary"}
-            onClick={handleSalesInsights} 
-            disabled={loading}
-            className={activeButton === 'salesInsights' ? `${styles.activeButton} ${styles.gridButton}` : styles.gridButton}
-          >
-          Insights
-          </Button>
-          */}
-          {/*
-          <Button 
-            appearance={activeButton === 'saveTemplate' ? "primary" : "secondary"}
-            onClick={handleSaveTemplate} 
-            disabled={loading || !generatedContent}
-            className={activeButton === 'saveTemplate' ? `${styles.activeButton} ${styles.gridButton}` : styles.gridButton}
-          >
-            Save Template
-          </Button>
-          */}
-          {/*
-          <Button 
-            appearance={activeButton === 'viewTemplates' ? "primary" : "secondary"}
-            onClick={handleViewTemplates} 
-            disabled={loading}
-            className={activeButton === 'viewTemplates' ? `${styles.activeButton} ${styles.gridButton}` : styles.gridButton}
-          >
-            View Templates
-          </Button>
-          */}
           <div className={styles.gridButton} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }}>
             <PromptConfig onSavePrompts={handleSavePrompts} />
           </div>

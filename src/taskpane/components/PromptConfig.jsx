@@ -42,9 +42,14 @@ const useStyles = makeStyles({
 });
 
 const defaultPrompts = {
+  writeEmail: "Write a professional email based on this description: {emailBody}",
+  editEmail: "Edit and improve this email for clarity and professionalism: {emailBody}",
+  respondToEmail: "Generate a professional response to this email: {emailBody}",
+  rewriteEmail: "Rewrite this email to be more professional and clear: {emailBody}",
+  cleanUpEmail: "Clean up and improve the grammar and structure of this email: {emailBody}",
+  summarize: "Summarize this email in 2 sentences:\n{emailBody}",
   suggestReply: "Suggest a professional reply to this email:\n{emailBody}",
   personalize: "Personalize a reply to this email for a sales manager named Jamie, referencing the Q3 report:\n{emailBody}",
-  summarize: "Summarize this email in 2 sentences:\n{emailBody}",
   extractActions: "Extract all action items from this email:\n{emailBody}",
   // salesInsights: "Provide sales insights and urgency analysis for this email:\n{emailBody}",
 };
@@ -52,7 +57,7 @@ const defaultPrompts = {
 const PromptConfig = ({ onSavePrompts }) => {
   const styles = useStyles();
   const [open, setOpen] = React.useState(false);
-  const [selectedTab, setSelectedTab] = React.useState("suggestReply");
+  const [selectedTab, setSelectedTab] = React.useState("writeEmail");
   const [prompts, setPrompts] = React.useState(defaultPrompts);
 
   const handleTabSelect = (event, data) => {
@@ -86,9 +91,14 @@ const PromptConfig = ({ onSavePrompts }) => {
           <DialogContent>
             <div className={styles.root}>
               <TabList selectedValue={selectedTab} onTabSelect={handleTabSelect}>
+                <Tab value="writeEmail">Write Email</Tab>
+                <Tab value="editEmail">Edit Email</Tab>
+                <Tab value="respondToEmail">Respond to Email</Tab>
+                <Tab value="rewriteEmail">Rewrite Email</Tab>
+                <Tab value="cleanUpEmail">Clean-Up Email</Tab>
+                <Tab value="summarize">Summarize</Tab>
                 <Tab value="suggestReply">Suggest Reply</Tab>
                 <Tab value="personalize">Personalize</Tab>
-                <Tab value="summarize">Summarize</Tab>
                 <Tab value="extractActions">Extract Actions</Tab>
                 {/* <Tab value="salesInsights">Sales Insights</Tab> */}
               </TabList>

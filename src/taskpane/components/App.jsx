@@ -11,7 +11,7 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    padding: "16px",
+    padding: "24px",
     boxSizing: "border-box",
   },
   headerContainer: {
@@ -36,7 +36,7 @@ const useStyles = makeStyles({
   contentArea: {
     width: "100%",
     minHeight: "300px",
-    background: "#fafafa",
+    background: "#f0f0f0",
     borderRadius: "8px",
     padding: "20px",
     color: "#323130",
@@ -49,7 +49,7 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     border: "1px solid #e1e1e1",
-    margin: "0",
+    margin: "12px 16px 4px 16px",
     transition: "box-shadow 0.2s, border-color 0.2s, background 0.2s",
     maxWidth: "none",
   },
@@ -102,6 +102,9 @@ const App = (props) => {
     summarize: "Summarize this email in 2 sentences:\n{emailBody}",
     writeEmail: "Write a professional email with the following details:\nDescription: {description}\nAdditional Instructions: {additionalInstructions}\nTone: {tone}\nPoint of View: {pointOfView}",
   });
+  const [chatInput, setChatInput] = React.useState("");
+  const [chatHistory, setChatHistory] = React.useState([]);
+  const [isFirstResponse, setIsFirstResponse] = React.useState(true);
 
   // Responsive header style
   const headerTitle = "SalesGenie AI";
@@ -184,10 +187,55 @@ const App = (props) => {
     setLoading(false);
   };
 
+  // Chat input send handler: send direct prompt to LLM
+  const handleChatSend = async () => {
+    if (!chatInput.trim()) return;
+    
+    const userMessage = chatInput.trim();
+    setChatInput("");
+    
+    // Add user message to chat history
+    const newUserMessage = { type: 'user', content: userMessage };
+    setChatHistory(prev => [...prev, newUserMessage]);
+    
+    setLoading(true);
+    
+    try {
+      let prompt;
+      if (isFirstResponse && generatedContent && generatedContent !== "Generating...") {
+        // If there's existing content, include it in context
+        prompt = `Based on this previous response: "${generatedContent}"\n\nUser request: ${userMessage}`;
+        setIsFirstResponse(false);
+      } else {
+        // Build context from chat history
+        const context = chatHistory.map(msg => 
+          msg.type === 'user' ? `User: ${msg.content}` : `Assistant: ${msg.content}`
+        ).join('\n');
+        prompt = context ? `${context}\nUser: ${userMessage}` : userMessage;
+      }
+      
+      const reply = await getSuggestedReply(prompt);
+      
+      // Add AI response to chat history
+      const newAIMessage = { type: 'ai', content: reply };
+      setChatHistory(prev => [...prev, newAIMessage]);
+      
+      // Update the main content area with latest response
+      setGeneratedContent(reply);
+    } catch (e) {
+      const errorMessage = "Error: " + e;
+      setChatHistory(prev => [...prev, { type: 'ai', content: errorMessage }]);
+      setGeneratedContent(errorMessage);
+    }
+    setLoading(false);
+  };
+
   // Feature handlers
   const handleSuggestReply = () => {
     setActiveButton('suggestReply');
     setShowWriteEmailForm(false);
+    setChatHistory([]);
+    setIsFirstResponse(true);
     callGemini(customPrompts.suggestReply);
   };
   // const handleSummarize = () => {
@@ -198,6 +246,8 @@ const App = (props) => {
   const handleWriteEmail = () => {
     setActiveButton('writeEmail');
     setShowWriteEmailForm(true);
+    setChatHistory([]);
+    setIsFirstResponse(true);
     setGeneratedContent("");
   };
   const handleGenerateEmail = () => {
@@ -434,6 +484,94 @@ const App = (props) => {
             </Button>
           </div>
         )}
+        {activeButton === 'suggestReply' && (
+          <div style={{
+            padding: '16px 20px',
+            borderTop: '1px solid #e1e1e1',
+            marginTop: '16px',
+            backgroundColor: '#f0f0f0',
+            borderRadius: '4px',
+            width: '100%',
+            boxSizing: 'border-box'
+          }}>
+            <h3 style={{
+              margin: '0 0 12px 0',
+              fontSize: '16px',
+              fontWeight: '600',
+              color: '#323130',
+              textAlign: 'center'
+            }}>Prompt Options</h3>
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '14px', color: '#323130' }}>
+                Additional Instructions
+              </label>
+              <textarea
+                placeholder="Any additional instructions..."
+                value={emailForm.additionalInstructions}
+                onChange={(e) => setEmailForm({ ...emailForm, additionalInstructions: e.target.value })}
+                style={{
+                  width: '100%',
+                  minHeight: '60px',
+                  padding: '10px',
+                  border: '1px solid #d1d1d1',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  backgroundColor: '#ffffff',
+                  boxSizing: 'border-box'
+                }}
+              />
+            </div>
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '14px', color: '#323130' }}>
+                Tone
+              </label>
+              <select
+                value={emailForm.tone}
+                onChange={(e) => setEmailForm({ ...emailForm, tone: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #d1d1d1',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  backgroundColor: '#ffffff',
+                  boxSizing: 'border-box',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="Formal">Formal</option>
+                <option value="Casual">Casual</option>
+                <option value="Friendly">Friendly</option>
+                <option value="Professional">Professional</option>
+                <option value="Persuasive">Persuasive</option>
+              </select>
+            </div>
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '14px', color: '#323130' }}>
+                Point of View
+              </label>
+              <select
+                value={emailForm.pointOfView}
+                onChange={(e) => setEmailForm({ ...emailForm, pointOfView: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #d1d1d1',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  backgroundColor: '#ffffff',
+                  boxSizing: 'border-box',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="Organization perspective">Organization perspective</option>
+                <option value="Personal perspective">Personal perspective</option>
+                <option value="Team perspective">Team perspective</option>
+                <option value="Customer perspective">Customer perspective</option>
+              </select>
+            </div>
+          </div>
+        )}
         <div
           className={styles.contentArea}
           dangerouslySetInnerHTML={{
@@ -446,6 +584,46 @@ const App = (props) => {
               : '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #605e5c; font-style: italic; text-align: center; padding: 40px;"><div><div style="font-size: 16px; margin-bottom: 8px;">✨ Your generated content will appear here</div><div style="font-size: 12px; opacity: 0.8;">Click a button above to get started</div></div></div>'
           }}
         />
+        {(activeButton === 'suggestReply' || activeButton === 'writeEmail') && (
+          <div style={{
+            display: 'flex',
+            borderTop: '1px solid #e1e1e1',
+            padding: '8px',
+            alignItems: 'center',
+            margin: '4px 16px 0 16px'
+          }}>
+            <input
+              type="text"
+              placeholder="Type your prompt..."
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleChatSend()}
+              style={{
+                flex: 1,
+                padding: '10px',
+                fontSize: '14px',
+                borderRadius: '20px',
+                border: '1px solid #d1d1d1',
+                marginRight: '8px',
+                outline: 'none',
+                backgroundColor: '#ffffff'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#0078d4'}
+              onBlur={(e) => e.target.style.borderColor = '#d1d1d1'}
+            />
+            <Button
+              appearance="primary"
+              disabled={loading || !chatInput.trim()}
+              onClick={handleChatSend}
+              style={{
+                borderRadius: '20px',
+                minWidth: '60px'
+              }}
+            >
+              {loading ? '...' : 'Send'}
+            </Button>
+          </div>
+        )}
       </div>
     </FluentProvider>
   );

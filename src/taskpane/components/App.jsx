@@ -595,7 +595,7 @@ const App = (props) => {
               : '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #605e5c; font-style: italic; text-align: center; padding: 40px;"><div><div style="font-size: 16px; margin-bottom: 8px;">✨ Your generated content will appear here</div><div style="font-size: 12px; opacity: 0.8;">Click a button above to get started</div></div></div>'
           }}
         />
-        {(activeButton === 'suggestReply' || activeButton === 'writeEmail') && (
+        {(activeButton === 'suggestReply' || (activeButton === 'writeEmail' && generatedContent && generatedContent !== "Generating..." && generatedContent !== "Generating email...")) && (
           <div style={{
             display: 'flex',
             borderTop: '1px solid #e1e1e1',

@@ -101,7 +101,7 @@ const App = (props) => {
   const [showWriteEmailForm, setShowWriteEmailForm] = React.useState(false);
   const [emailForm, setEmailForm] = React.useState({
     description: "",
-    additionalInstructions: "",
+    // additionalInstructions: "", // Commented out as per user request
     tone: "Formal",
     pointOfView: "Organization perspective"
   });
@@ -109,7 +109,7 @@ const App = (props) => {
   const [customPrompts, setCustomPrompts] = React.useState({
     suggestReply: "Suggest a professional reply to this email:\n{emailBody}",
     summarize: "Summarize this email in 2 sentences:\n{emailBody}",
-    writeEmail: "Write a professional email with the following details:\nDescription: {description}\nAdditional Instructions: {additionalInstructions}\nTone: {tone}\nPoint of View: {pointOfView}",
+    writeEmail: "Write a professional email with the following details:\nDescription: {description}\nTone: {tone}\nPoint of View: {pointOfView}",
   });
   const [chatInput, setChatInput] = React.useState("");
   const [chatHistory, setChatHistory] = React.useState([]);
@@ -267,7 +267,7 @@ const App = (props) => {
     
     const prompt = customPrompts.writeEmail
       .replace("{description}", emailForm.description)
-      .replace("{additionalInstructions}", emailForm.additionalInstructions || "None")
+      // .replace("{additionalInstructions}", emailForm.additionalInstructions || "None") // Commented out as per user request
       .replace("{tone}", emailForm.tone)
       .replace("{pointOfView}", emailForm.pointOfView);
     
@@ -378,7 +378,8 @@ const App = (props) => {
               />
             </div>
             
-            <div style={{ marginBottom: '16px' }}>
+            {/* Additional Instructions section - Hidden as per user request */}
+            {/* <div style={{ marginBottom: '16px' }}>
               <label style={{ 
                 display: 'block', 
                 marginBottom: '6px', 
@@ -407,7 +408,7 @@ const App = (props) => {
                 onFocus={(e) => e.target.style.borderColor = '#0078d4'}
                 onBlur={(e) => e.target.style.borderColor = '#d1d1d1'}
               />
-            </div>
+            </div> */}
             
             <div style={{ marginBottom: '16px' }}>
               <label style={{ 
@@ -510,7 +511,8 @@ const App = (props) => {
               color: '#323130',
               textAlign: 'center'
             }}>Prompt Options</h3>
-            <div style={{ marginBottom: '12px' }}>
+            {/* Additional Instructions section - Hidden as per user request */}
+            {/* <div style={{ marginBottom: '12px' }}>
               <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '14px', color: '#323130' }}>
                 Additional Instructions
               </label>
@@ -529,7 +531,7 @@ const App = (props) => {
                   boxSizing: 'border-box'
                 }}
               />
-            </div>
+            </div> */}
             <div style={{ marginBottom: '12px' }}>
               <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '14px', color: '#323130' }}>
                 Tone

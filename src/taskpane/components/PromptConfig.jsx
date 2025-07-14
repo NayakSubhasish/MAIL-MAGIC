@@ -42,7 +42,7 @@ const useStyles = makeStyles({
 });
 
 const defaultPrompts = {
-  writeEmail: "Write a professional email with the following details:\nDescription: {description}\nAdditional Instructions: {additionalInstructions}\nTone: {tone}\nPoint of View: {pointOfView}",
+  writeEmail: "Write a professional email with the following details:\nDescription: {description}\nTone: {tone}\nPoint of View: {pointOfView}",
   suggestReply: "Suggest a professional reply to this email:\n{emailBody}",
   summarize: "Summarize this email in 2 sentences:\n{emailBody}",
 };

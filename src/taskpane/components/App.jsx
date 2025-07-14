@@ -11,7 +11,7 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    padding: "8px 0",
+    padding: "16px",
     boxSizing: "border-box",
   },
   headerContainer: {
@@ -26,36 +26,38 @@ const useStyles = makeStyles({
   buttonGrid: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
-    gap: "8px",
+    gap: "12px",
     marginTop: "0",
-    marginBottom: "16px",
+    marginBottom: "20px",
     width: "100%",
-    maxWidth: "none",
-    padding: "0 8px",
+    maxWidth: "400px",
+    padding: "0",
   },
   contentArea: {
     width: "100%",
     minHeight: "300px",
-    background: tokens.colorNeutralBackground2,
+    background: "#fafafa",
     borderRadius: "8px",
-    padding: "24px",
+    padding: "20px",
     color: "#323130",
     fontSize: "14px",
     lineHeight: "1.6",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
     wordBreak: "break-word",
     overflowY: "auto",
     flex: 1,
     display: "flex",
     flexDirection: "column",
     border: "1px solid #e1e1e1",
-    margin: "16px 16px 0 16px",
+    margin: "0",
+    transition: "box-shadow 0.2s, border-color 0.2s, background 0.2s",
+    maxWidth: "none",
   },
   gridButton: {
-    minHeight: "48px",
+    minHeight: "44px",
     fontSize: "14px",
     fontWeight: "600",
-    borderRadius: "8px",
+    borderRadius: "4px",
     border: "1px solid #d1d1d1",
     backgroundColor: "#ffffff",
     color: "#323130",
@@ -188,11 +190,11 @@ const App = (props) => {
     setShowWriteEmailForm(false);
     callGemini(customPrompts.suggestReply);
   };
-  const handleSummarize = () => {
-    setActiveButton('summarize');
-    setShowWriteEmailForm(false);
-    callGemini(customPrompts.summarize);
-  };
+  // const handleSummarize = () => {
+  //   setActiveButton('summarize');
+  //   setShowWriteEmailForm(false);
+  //   callGemini(customPrompts.summarize);
+  // };
   const handleWriteEmail = () => {
     setActiveButton('writeEmail');
     setShowWriteEmailForm(true);
@@ -238,9 +240,9 @@ const App = (props) => {
     setGeneratedContent("");
   };
 
-  const handleSavePrompts = (newPrompts) => {
-    setCustomPrompts(newPrompts);
-  };
+  // const handleSavePrompts = (newPrompts) => {
+  //   setCustomPrompts(newPrompts);
+  // };
 
   // const toggleDarkMode = () => {
   //   setIsDarkMode(!isDarkMode);
@@ -266,18 +268,6 @@ const App = (props) => {
           >
             Suggest Reply
           </Button>
-          <Button 
-            appearance={activeButton === 'summarize' ? "primary" : "secondary"}
-            onClick={handleSummarize} 
-            disabled={loading}
-            className={activeButton === 'summarize' ? `${styles.activeButton} ${styles.gridButton}` : styles.gridButton}
-          >
-            Summarize
-          </Button>
-          <div className={styles.gridButton} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0' }}>
-            <PromptConfig onSavePrompts={handleSavePrompts} />
-          </div>
-          {/* Dark mode toggle disabled for now */}
         </div>
         
         {showWriteEmailForm && (

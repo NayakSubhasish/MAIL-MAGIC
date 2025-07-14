@@ -36,10 +36,9 @@ const useStyles = makeStyles({
   contentArea: {
     width: "100%",
     minHeight: "300px",
-    background: "#ffffff",
+    background: tokens.colorNeutralBackground2,
     borderRadius: "8px",
-    padding: "20px",
-    marginTop: "8px",
+    padding: "24px",
     color: "#323130",
     fontSize: "14px",
     lineHeight: "1.6",
@@ -50,7 +49,7 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     border: "1px solid #e1e1e1",
-    margin: "8px 8px 0 8px",
+    margin: "16px 16px 0 16px",
   },
   gridButton: {
     minHeight: "48px",

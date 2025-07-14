@@ -188,7 +188,25 @@ const App = (props) => {
       const prompt = promptTemplate.replace("{emailBody}", contextWithThread);
       
       console.log("prompt", prompt);
+      
+      // Monitor for retry attempts
+      let retryCount = 0;
+      const originalLog = console.log;
+      console.log = (...args) => {
+        if (args[0] && args[0].includes && args[0].includes('Gemini API attempt')) {
+          retryCount++;
+          if (retryCount > 1) {
+            setGeneratedContent(`Generating... (API busy, retrying - attempt ${retryCount})`);
+          }
+        }
+        originalLog.apply(console, args);
+      };
+      
       const reply = await getSuggestedReply(prompt);
+      
+      // Restore original console.log
+      console.log = originalLog;
+      
       setGeneratedContent(reply);
     } catch (e) {
       setGeneratedContent("Error: " + e);
@@ -223,7 +241,23 @@ const App = (props) => {
         prompt = context ? `${context}\nUser: ${userMessage}` : userMessage;
       }
       
+      // Monitor for retry attempts
+      let retryCount = 0;
+      const originalLog = console.log;
+      console.log = (...args) => {
+        if (args[0] && args[0].includes && args[0].includes('Gemini API attempt')) {
+          retryCount++;
+          if (retryCount > 1) {
+            setGeneratedContent(`Processing... (API busy, retrying - attempt ${retryCount})`);
+          }
+        }
+        originalLog.apply(console, args);
+      };
+      
       const reply = await getSuggestedReply(prompt);
+      
+      // Restore original console.log
+      console.log = originalLog;
       
       // Add AI response to chat history
       const newAIMessage = { type: 'ai', content: reply };
@@ -259,7 +293,7 @@ const App = (props) => {
     setIsFirstResponse(true);
     setGeneratedContent("");
   };
-  const handleGenerateEmail = () => {
+  const handleGenerateEmail = async () => {
     if (!emailForm.description.trim()) {
       setGeneratedContent("Please enter a description for the email.");
       return;
@@ -273,13 +307,32 @@ const App = (props) => {
     
     setLoading(true);
     setGeneratedContent("Generating email...");
-    getSuggestedReply(prompt).then(reply => {
+    
+    try {
+      // Monitor for retry attempts by intercepting console logs
+      let retryCount = 0;
+      const originalLog = console.log;
+      console.log = (...args) => {
+        if (args[0] && args[0].includes && args[0].includes('Gemini API attempt')) {
+          retryCount++;
+          if (retryCount > 1) {
+            setGeneratedContent(`Generating email... (API busy, retrying - attempt ${retryCount})`);
+          }
+        }
+        originalLog.apply(console, args);
+      };
+      
+      const reply = await getSuggestedReply(prompt);
+      
+      // Restore original console.log
+      console.log = originalLog;
+      
       setGeneratedContent(reply);
       setLoading(false);
-    }).catch(e => {
+    } catch (e) {
       setGeneratedContent("Error: " + e);
       setLoading(false);
-    });
+    }
   };
   const handleSaveTemplate = () => {
     setActiveButton('saveTemplate');

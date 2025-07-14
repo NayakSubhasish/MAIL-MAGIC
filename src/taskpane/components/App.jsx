@@ -2,7 +2,7 @@ import * as React from "react";
 import PropTypes from "prop-types";
 import PromptConfig from "./PromptConfig";
 import { Button, makeStyles, tokens, FluentProvider, teamsLightTheme, teamsDarkTheme, Switch, Label } from "@fluentui/react-components";
-import { getSuggestedReply } from "../geminiApi";
+import { getSuggestedReply } from "../botAtWorkApi";
 
 const useStyles = makeStyles({
   root: {
@@ -36,24 +36,24 @@ const useStyles = makeStyles({
   contentArea: {
     width: "100%",
     minHeight: "300px",
-    background: "linear-gradient(145deg, #ffffff, #f0f0f0)",
+    background: "linear-gradient(145deg, #e8e8e8, #d4d4d4)",
     borderRadius: "8px",
     padding: "20px",
-    color: "#323130",
+    color: "#2d2d2d",
     fontSize: "15px",
     lineHeight: "1.7",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.1)",
+    boxShadow: "0 4px 20px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.15)",
     wordBreak: "break-word",
     overflowY: "auto",
     flex: 1,
     display: "flex",
     flexDirection: "column",
-    border: "1px solid rgba(0,0,0,0.08)",
+    border: "1px solid rgba(0,0,0,0.12)",
     margin: "12px 16px 4px 16px",
     transition: "all 0.3s ease",
     maxWidth: "none",
     "&:hover": {
-      boxShadow: "0 8px 30px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.1)",
+      boxShadow: "0 8px 30px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.15)",
     },
   },
   gridButton: {
@@ -193,7 +193,7 @@ const App = (props) => {
       let retryCount = 0;
       const originalLog = console.log;
       console.log = (...args) => {
-        if (args[0] && args[0].includes && args[0].includes('Gemini API attempt')) {
+        if (args[0] && args[0].includes && args[0].includes('BotAtWork API attempt')) {
           retryCount++;
           if (retryCount > 1) {
             setGeneratedContent(`Generating... (API busy, retrying - attempt ${retryCount})`);
@@ -245,7 +245,7 @@ const App = (props) => {
       let retryCount = 0;
       const originalLog = console.log;
       console.log = (...args) => {
-        if (args[0] && args[0].includes && args[0].includes('Gemini API attempt')) {
+        if (args[0] && args[0].includes && args[0].includes('BotAtWork API attempt')) {
           retryCount++;
           if (retryCount > 1) {
             setGeneratedContent(`Processing... (API busy, retrying - attempt ${retryCount})`);
@@ -313,7 +313,7 @@ const App = (props) => {
       let retryCount = 0;
       const originalLog = console.log;
       console.log = (...args) => {
-        if (args[0] && args[0].includes && args[0].includes('Gemini API attempt')) {
+        if (args[0] && args[0].includes && args[0].includes('BotAtWork API attempt')) {
           retryCount++;
           if (retryCount > 1) {
             setGeneratedContent(`Generating email... (API busy, retrying - attempt ${retryCount})`);

@@ -1,7 +1,7 @@
 import * as React from "react";
 import PropTypes from "prop-types";
 import PromptConfig from "./PromptConfig";
-import { Button, makeStyles, tokens, FluentProvider, teamsLightTheme, teamsDarkTheme, Switch, Label } from "@fluentui/react-components";
+import { Button, makeStyles, tokens, FluentProvider, teamsLightTheme, teamsDarkTheme, Switch, Label, Tab, TabList } from "@fluentui/react-components";
 import { getSuggestedReply } from "../botAtWorkApi";
 
 const useStyles = makeStyles({
@@ -11,7 +11,7 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    padding: "24px",
+    padding: "16px",
     boxSizing: "border-box",
   },
   headerContainer: {
@@ -23,22 +23,17 @@ const useStyles = makeStyles({
     boxSizing: "border-box",
     marginBottom: "16px",
   },
-  buttonGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "12px",
-    marginTop: "0",
-    marginBottom: "20px",
+  tabContainer: {
     width: "100%",
     maxWidth: "400px",
-    padding: "0",
+    marginBottom: "10px",
   },
   contentArea: {
     width: "100%",
     minHeight: "300px",
     background: "linear-gradient(145deg, #e8e8e8, #d4d4d4)",
     borderRadius: "8px",
-    padding: "20px",
+    padding: "16px",
     color: "#2d2d2d",
     fontSize: "15px",
     lineHeight: "1.7",
@@ -49,7 +44,7 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     border: "1px solid rgba(0,0,0,0.12)",
-    margin: "12px 16px 4px 16px",
+    margin: "4px 8px 4px 8px",
     transition: "all 0.3s ease",
     maxWidth: "none",
     "&:hover": {
@@ -97,8 +92,8 @@ const App = (props) => {
   const [generatedContent, setGeneratedContent] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [templates, setTemplates] = React.useState([]);
-  const [activeButton, setActiveButton] = React.useState(null);
-  const [showWriteEmailForm, setShowWriteEmailForm] = React.useState(false);
+  const [activeTab, setActiveTab] = React.useState("writeEmail");
+  const [showWriteEmailForm, setShowWriteEmailForm] = React.useState(true);
   const [emailForm, setEmailForm] = React.useState({
     description: "",
     // additionalInstructions: "", // Commented out as per user request
@@ -273,25 +268,20 @@ const App = (props) => {
     setLoading(false);
   };
 
-  // Feature handlers
-  const handleSuggestReply = () => {
-    setActiveButton('suggestReply');
-    setShowWriteEmailForm(false);
-    setChatHistory([]);
-    setIsFirstResponse(true);
-    callGemini(customPrompts.suggestReply);
-  };
-  // const handleSummarize = () => {
-  //   setActiveButton('summarize');
-  //   setShowWriteEmailForm(false);
-  //   callGemini(customPrompts.summarize);
-  // };
-  const handleWriteEmail = () => {
-    setActiveButton('writeEmail');
+  // Tab handler
+  const handleTabSelect = (event, data) => {
+    setActiveTab(data.value);
+    if (data.value === 'writeEmail') {
     setShowWriteEmailForm(true);
-    setChatHistory([]);
-    setIsFirstResponse(true);
+      setChatHistory([]);
+      setIsFirstResponse(true);
     setGeneratedContent("");
+    } else if (data.value === 'suggestReply') {
+      setShowWriteEmailForm(false);
+      setChatHistory([]);
+      setIsFirstResponse(true);
+      callGemini(customPrompts.suggestReply);
+    }
   };
   const handleGenerateEmail = async () => {
     if (!emailForm.description.trim()) {
@@ -335,12 +325,10 @@ const App = (props) => {
     }
   };
   const handleSaveTemplate = () => {
-    setActiveButton('saveTemplate');
     setTemplates((prev) => [...prev, generatedContent]);
     setGeneratedContent("Template saved.");
   };
   const handleViewTemplates = () => {
-    setActiveButton('viewTemplates');
     if (templates.length === 0) {
       setGeneratedContent("No templates saved.");
     } else {
@@ -348,7 +336,6 @@ const App = (props) => {
     }
   };
   const handleClear = () => {
-    setActiveButton('clear');
     setGeneratedContent("");
   };
 
@@ -363,47 +350,27 @@ const App = (props) => {
   return (
     <FluentProvider theme={teamsLightTheme}> {/* dark mode disabled for now */}
       <div className={styles.root}>
-        <div className={styles.buttonGrid}>
-          <Button 
-            appearance={activeButton === 'writeEmail' ? "primary" : "secondary"}
-            onClick={handleWriteEmail} 
-            disabled={loading}
-            className={activeButton === 'writeEmail' ? `${styles.activeButton} ${styles.gridButton}` : styles.gridButton}
-          >
-            Write Email
-          </Button>
-          <Button 
-            appearance={activeButton === 'suggestReply' ? "primary" : "secondary"}
-            onClick={handleSuggestReply} 
-            disabled={loading}
-            className={activeButton === 'suggestReply' ? `${styles.activeButton} ${styles.gridButton}` : styles.gridButton}
-          >
-            Suggest Reply
-          </Button>
+        <div className={styles.tabContainer}>
+          <TabList selectedValue={activeTab} onTabSelect={handleTabSelect}>
+            <Tab value="writeEmail">Write Email</Tab>
+            <Tab value="suggestReply">Suggest Reply</Tab>
+          </TabList>
         </div>
         
         {showWriteEmailForm && (
           <div style={{ 
-            padding: '16px 8px', 
+            padding: '8px', 
             borderTop: '1px solid #e1e1e1', 
-            marginTop: '16px',
+            marginTop: '4px',
             backgroundColor: '#fafafa',
             borderRadius: '0',
             width: '100%',
             boxSizing: 'border-box'
           }}>
-            <h3 style={{ 
-              margin: '0 0 20px 0', 
-              fontSize: '18px', 
-              fontWeight: '600',
-              color: '#323130',
-              textAlign: 'center'
-            }}>Write New Email</h3>
-            
-            <div style={{ marginBottom: '16px' }}>
+            <div style={{ marginBottom: '8px' }}>
               <label style={{ 
                 display: 'block', 
-                marginBottom: '6px', 
+                marginBottom: '3px', 
                 fontWeight: '600',
                 fontSize: '14px',
                 color: '#323130'
@@ -414,8 +381,8 @@ const App = (props) => {
                 onChange={(e) => setEmailForm({...emailForm, description: e.target.value})}
                 style={{
                   width: '100%',
-                  minHeight: '80px',
-                  padding: '10px',
+                  minHeight: '60px',
+                  padding: '6px',
                   border: '1px solid #d1d1d1',
                   borderRadius: '4px',
                   fontSize: '14px',
@@ -463,10 +430,10 @@ const App = (props) => {
               />
             </div> */}
             
-            <div style={{ marginBottom: '16px' }}>
+            <div style={{ marginBottom: '8px' }}>
               <label style={{ 
                 display: 'block', 
-                marginBottom: '6px', 
+                marginBottom: '3px', 
                 fontWeight: '600',
                 fontSize: '14px',
                 color: '#323130'
@@ -476,7 +443,7 @@ const App = (props) => {
                 onChange={(e) => setEmailForm({...emailForm, tone: e.target.value})}
                 style={{
                   width: '100%',
-                  padding: '10px',
+                  padding: '6px',
                   border: '1px solid #d1d1d1',
                   borderRadius: '4px',
                   fontSize: '14px',
@@ -491,16 +458,15 @@ const App = (props) => {
               >
                 <option value="Formal">Formal</option>
                 <option value="Casual">Casual</option>
-                <option value="Friendly">Friendly</option>
                 <option value="Professional">Professional</option>
-                <option value="Persuasive">Persuasive</option>
+                <option value="Empathetic">Empathetic</option>
               </select>
             </div>
             
-            <div style={{ marginBottom: '20px' }}>
+            <div style={{ marginBottom: '10px' }}>
               <label style={{ 
                 display: 'block', 
-                marginBottom: '6px', 
+                marginBottom: '3px', 
                 fontWeight: '600',
                 fontSize: '14px',
                 color: '#323130'
@@ -510,7 +476,7 @@ const App = (props) => {
                 onChange={(e) => setEmailForm({...emailForm, pointOfView: e.target.value})}
                 style={{
                   width: '100%',
-                  padding: '10px',
+                  padding: '6px',
                   border: '1px solid #d1d1d1',
                   borderRadius: '4px',
                   fontSize: '14px',
@@ -524,46 +490,40 @@ const App = (props) => {
                 onBlur={(e) => e.target.style.borderColor = '#d1d1d1'}
               >
                 <option value="Organization perspective">Organization perspective</option>
-                <option value="Personal perspective">Personal perspective</option>
-                <option value="Team perspective">Team perspective</option>
-                <option value="Customer perspective">Customer perspective</option>
+                <option value="Individual perspective">Individual perspective</option>
               </select>
             </div>
             
             <Button
-              appearance="primary"
+              appearance={emailForm.description.trim() ? "primary" : "secondary"}
               onClick={handleGenerateEmail}
               disabled={loading || !emailForm.description.trim()}
               style={{ 
                 width: '100%',
-                padding: '12px 24px',
-                fontSize: '16px',
+                padding: '8px 16px',
+                fontSize: '15px',
                 fontWeight: '600',
                 borderRadius: '4px',
-                minHeight: '44px'
+                minHeight: '36px',
+                backgroundColor: emailForm.description.trim() ? '#0078d4' : '#f3f2f1',
+                color: emailForm.description.trim() ? '#ffffff' : '#323130',
+                border: emailForm.description.trim() ? 'none' : '1px solid #d1d1d1'
               }}
             >
               {loading ? 'Generating...' : 'Generate Email'}
             </Button>
           </div>
         )}
-        {activeButton === 'suggestReply' && (
+        {activeTab === 'suggestReply' && (
           <div style={{
-            padding: '16px 20px',
+            padding: '12px 16px',
             borderTop: '1px solid #e1e1e1',
-            marginTop: '16px',
+            marginTop: '8px',
             backgroundColor: '#f0f0f0',
             borderRadius: '4px',
             width: '100%',
             boxSizing: 'border-box'
           }}>
-            <h3 style={{
-              margin: '0 0 12px 0',
-              fontSize: '16px',
-              fontWeight: '600',
-              color: '#323130',
-              textAlign: 'center'
-            }}>Prompt Options</h3>
             {/* Additional Instructions section - Hidden as per user request */}
             {/* <div style={{ marginBottom: '12px' }}>
               <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '14px', color: '#323130' }}>
@@ -605,9 +565,8 @@ const App = (props) => {
               >
                 <option value="Formal">Formal</option>
                 <option value="Casual">Casual</option>
-                <option value="Friendly">Friendly</option>
                 <option value="Professional">Professional</option>
-                <option value="Persuasive">Persuasive</option>
+                <option value="Empathetic">Empathetic</option>
               </select>
             </div>
             <div style={{ marginBottom: '12px' }}>
@@ -629,9 +588,7 @@ const App = (props) => {
                 }}
               >
                 <option value="Organization perspective">Organization perspective</option>
-                <option value="Personal perspective">Personal perspective</option>
-                <option value="Team perspective">Team perspective</option>
-                <option value="Customer perspective">Customer perspective</option>
+                <option value="Individual perspective">Individual perspective</option>
               </select>
             </div>
           </div>
@@ -645,16 +602,16 @@ const App = (props) => {
                   .replace(/\n/g, '<br>') // preserve line breaks
                   .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>') // bold for **text**
                   .replace(/\*(.*?)\*/g, '<i>$1</i>') // italics for *text*
-              : '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #605e5c; font-style: italic; text-align: center; padding: 40px;"><div><div style="font-size: 16px; margin-bottom: 8px;">✨ Your generated content will appear here</div><div style="font-size: 12px; opacity: 0.8;">Click a button above to get started</div></div></div>'
+              : '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #605e5c; font-style: italic; text-align: center; padding: 30px;"><div><div style="font-size: 16px; margin-bottom: 6px;">✨ Your generated content will appear here</div><div style="font-size: 12px; opacity: 0.8;">Click a button above to get started</div></div></div>'
           }}
         />
-        {(activeButton === 'suggestReply' || (activeButton === 'writeEmail' && generatedContent && generatedContent !== "Generating..." && generatedContent !== "Generating email...")) && (
+        {(activeTab === 'suggestReply' || (activeTab === 'writeEmail' && generatedContent && generatedContent !== "Generating..." && generatedContent !== "Generating email...")) && (
           <div style={{
             display: 'flex',
             borderTop: '1px solid #e1e1e1',
-            padding: '8px',
+            padding: '6px',
             alignItems: 'center',
-            margin: '4px 16px 0 16px'
+            margin: '2px 8px 0 8px'
           }}>
             <input
               type="text"
@@ -664,24 +621,39 @@ const App = (props) => {
               onKeyPress={(e) => e.key === 'Enter' && handleChatSend()}
               style={{
                 flex: 1,
-                padding: '10px',
+                padding: '8px 12px',
                 fontSize: '14px',
-                borderRadius: '20px',
+                borderRadius: '18px',
                 border: '1px solid #d1d1d1',
-                marginRight: '8px',
+                marginRight: '6px',
                 outline: 'none',
-                backgroundColor: '#ffffff'
+                background: 'linear-gradient(145deg, #e8e8e8, #d4d4d4)',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
               }}
-              onFocus={(e) => e.target.style.borderColor = '#0078d4'}
-              onBlur={(e) => e.target.style.borderColor = '#d1d1d1'}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#0078d4';
+                e.target.style.background = 'linear-gradient(145deg, #f0f0f0, #e0e0e0)';
+                e.target.style.boxShadow = '0 4px 12px rgba(0,120,212,0.2)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#d1d1d1';
+                e.target.style.background = 'linear-gradient(145deg, #e8e8e8, #d4d4d4)';
+                e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+              }}
             />
             <Button
               appearance="primary"
               disabled={loading || !chatInput.trim()}
               onClick={handleChatSend}
               style={{
-                borderRadius: '20px',
-                minWidth: '60px'
+                borderRadius: '18px',
+                minWidth: '55px',
+                padding: '8px 12px',
+                backgroundColor: '#0078d4',
+                color: '#ffffff',
+                border: 'none',
+                opacity: (loading || !chatInput.trim()) ? 0.5 : 1
               }}
             >
               {loading ? '...' : 'Send'}

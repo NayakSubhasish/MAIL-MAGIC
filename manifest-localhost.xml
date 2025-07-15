@@ -12,6 +12,7 @@
   <Description DefaultValue="AI-powered email assistant - Local Development"/>
   <IconUrl DefaultValue="https://nayaksubhasish.github.io/MAIL-MAGIC/assets/logo.png"/>
   <HighResolutionIconUrl DefaultValue="https://nayaksubhasish.github.io/MAIL-MAGIC/assets/logo.png"/>
+  
   <SupportUrl DefaultValue="https://www.flatworldsolutions.com/help"/>
   <AppDomains>
     <AppDomain>https://localhost:3000</AppDomain>

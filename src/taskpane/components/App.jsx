@@ -102,7 +102,7 @@ const App = (props) => {
   });
   // const [isDarkMode, setIsDarkMode] = React.useState(false); // dark mode temporarily disabled
   const [customPrompts, setCustomPrompts] = React.useState({
-    suggestReply: "Suggest a professional reply to this email:\n{emailBody}",
+    suggestReply: "Suggest a professional reply to this email considering the specified tone and point of view:\n\nEmail to reply to:\n{emailBody}\n\nResponse Requirements:\nTone: {tone}\nPoint of View: {pointOfView}\n\nPlease craft a reply that matches the specified tone and perspective.",
     summarize: "Summarize this email in 2 sentences:\n{emailBody}",
     writeEmail: "Write a professional email with the following details:\nDescription: {description}\nTone: {tone}\nPoint of View: {pointOfView}",
   });
@@ -180,7 +180,10 @@ const App = (props) => {
       
       // Include conversation thread context in the prompt
       const contextWithThread = `Conversation Context:\n${conversationThread}\n\nCurrent Email:\n${emailBody}`;
-      const prompt = promptTemplate.replace("{emailBody}", contextWithThread);
+      const prompt = promptTemplate
+        .replace("{emailBody}", contextWithThread)
+        .replace("{tone}", emailForm.tone)
+        .replace("{pointOfView}", emailForm.pointOfView);
       
       console.log("prompt", prompt);
       
@@ -591,6 +594,25 @@ const App = (props) => {
                 <option value="Individual perspective">Individual perspective</option>
               </select>
             </div>
+            <Button
+              appearance="primary"
+              onClick={() => callGemini(customPrompts.suggestReply)}
+              disabled={loading}
+              style={{ 
+                width: '100%',
+                padding: '10px 16px',
+                fontSize: '15px',
+                fontWeight: '600',
+                borderRadius: '4px',
+                minHeight: '40px',
+                backgroundColor: '#0078d4',
+                color: '#ffffff',
+                border: 'none',
+                opacity: loading ? 0.5 : 1
+              }}
+            >
+              {loading ? 'Generating...' : 'Generate New Reply'}
+            </Button>
           </div>
         )}
         <div

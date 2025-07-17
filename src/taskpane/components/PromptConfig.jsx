@@ -43,7 +43,7 @@ const useStyles = makeStyles({
 
 const defaultPrompts = {
   writeEmail: "Write a professional email with the following details:\nDescription: {description}\nTone: {tone}\nPoint of View: {pointOfView}",
-  suggestReply: "Suggest a professional reply to this email:\n{emailBody}",
+  suggestReply: "Suggest a professional reply to this email considering the specified tone and point of view:\n\nEmail to reply to:\n{emailBody}\n\nResponse Requirements:\nTone: {tone}\nPoint of View: {pointOfView}\n\nPlease craft a reply that matches the specified tone and perspective.",
   summarize: "Summarize this email in 2 sentences:\n{emailBody}",
 };
 
@@ -112,7 +112,7 @@ const PromptConfig = ({ onSavePrompts }) => {
                   rows={10}
                 />
                 <div style={{ fontSize: "12px", color: tokens.colorNeutralForeground3, marginTop: "4px" }}>
-                  Use {"{emailBody}"} as a placeholder for the email content
+                  Available placeholders: {"{emailBody}"} (email content), {"{tone}"} (response tone), {"{pointOfView}"} (perspective), {"{description}"} (for writeEmail)
                 </div>
               </div>
             </div>

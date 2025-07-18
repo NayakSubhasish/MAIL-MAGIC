@@ -13,6 +13,12 @@ const useStyles = makeStyles({
     alignItems: "center",
     padding: "16px",
     boxSizing: "border-box",
+    overflow: "hidden",
+    scrollbarWidth: "none",
+    msOverflowStyle: "none",
+    "&::-webkit-scrollbar": {
+      display: "none",
+    },
   },
   headerContainer: {
     width: "100%",
@@ -28,9 +34,10 @@ const useStyles = makeStyles({
     maxWidth: "400px",
     marginBottom: "10px",
   },
-  contentArea: {
+    contentArea: {
     width: "100%",
-    minHeight: "300px",
+    minHeight: "200px",
+    maxHeight: "400px",
     background: "linear-gradient(145deg, #e8e8e8, #d4d4d4)",
     borderRadius: "8px",
     padding: "16px",
@@ -39,8 +46,8 @@ const useStyles = makeStyles({
     lineHeight: "1.7",
     boxShadow: "0 4px 20px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.15)",
     wordBreak: "break-word",
-    overflowY: "auto",
-    flex: 1,
+    overflow: "hidden",
+    flex: "1 1 auto",
     display: "flex",
     flexDirection: "column",
     border: "1px solid rgba(0,0,0,0.12)",
@@ -361,14 +368,13 @@ const App = (props) => {
         </div>
         
         {showWriteEmailForm && (
-          <div style={{ 
-            padding: '8px', 
-            borderTop: '1px solid #e1e1e1', 
-            marginTop: '4px',
-            backgroundColor: '#fafafa',
-            borderRadius: '0',
+          <div style={{
+            padding: '8px',
             width: '100%',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+            borderRadius: '8px',
+            marginBottom: '8px'
           }}>
             <div style={{ marginBottom: '8px' }}>
               <label style={{ 
@@ -433,68 +439,75 @@ const App = (props) => {
               />
             </div> */}
             
-            <div style={{ marginBottom: '8px' }}>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '3px', 
-                fontWeight: '600',
-                fontSize: '14px',
-                color: '#323130'
-              }}>Tone *</label>
-              <select
-                value={emailForm.tone}
-                onChange={(e) => setEmailForm({...emailForm, tone: e.target.value})}
-                style={{
-                  width: '100%',
-                  padding: '6px',
-                  border: '1px solid #d1d1d1',
-                  borderRadius: '4px',
+            <div style={{ 
+              display: 'flex', 
+              gap: '8px', 
+              marginBottom: '10px',
+              alignItems: 'flex-end'
+            }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ 
+                  display: 'block', 
+                  marginBottom: '3px', 
+                  fontWeight: '600',
                   fontSize: '14px',
-                  fontFamily: 'inherit',
-                  backgroundColor: '#ffffff',
-                  boxSizing: 'border-box',
-                  outline: 'none',
-                  cursor: 'pointer'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#0078d4'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d1d1'}
-              >
-                <option value="Formal">Formal</option>
-                <option value="Casual">Casual</option>
-                <option value="Professional">Professional</option>
-                <option value="Empathetic">Empathetic</option>
-              </select>
-            </div>
-            
-            <div style={{ marginBottom: '10px' }}>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '3px', 
-                fontWeight: '600',
-                fontSize: '14px',
-                color: '#323130'
-              }}>Point of View *</label>
-              <select
-                value={emailForm.pointOfView}
-                onChange={(e) => setEmailForm({...emailForm, pointOfView: e.target.value})}
-                style={{
-                  width: '100%',
-                  padding: '6px',
-                  border: '1px solid #d1d1d1',
-                  borderRadius: '4px',
+                  color: '#323130'
+                }}>Tone *</label>
+                <select
+                  value={emailForm.tone}
+                  onChange={(e) => setEmailForm({...emailForm, tone: e.target.value})}
+                  style={{
+                    width: '100%',
+                    padding: '6px',
+                    border: '1px solid #d1d1d1',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    fontFamily: 'inherit',
+                    backgroundColor: '#ffffff',
+                    boxSizing: 'border-box',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#0078d4'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d1d1'}
+                >
+                  <option value="Formal">Formal</option>
+                  <option value="Casual">Casual</option>
+                  <option value="Professional">Professional</option>
+                  <option value="Empathetic">Empathetic</option>
+                </select>
+              </div>
+              
+              <div style={{ flex: 1 }}>
+                <label style={{ 
+                  display: 'block', 
+                  marginBottom: '3px', 
+                  fontWeight: '600',
                   fontSize: '14px',
-                  fontFamily: 'inherit',
-                  backgroundColor: '#ffffff',
-                  boxSizing: 'border-box',
-                  outline: 'none',
-                  cursor: 'pointer'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#0078d4'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d1d1'}
-              >
-                <option value="Organization perspective">Organization perspective</option>
-                <option value="Individual perspective">Individual perspective</option>
-              </select>
+                  color: '#323130'
+                }}>Point of View *</label>
+                <select
+                  value={emailForm.pointOfView}
+                  onChange={(e) => setEmailForm({...emailForm, pointOfView: e.target.value})}
+                  style={{
+                    width: '100%',
+                    padding: '6px',
+                    border: '1px solid #d1d1d1',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    fontFamily: 'inherit',
+                    backgroundColor: '#ffffff',
+                    boxSizing: 'border-box',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#0078d4'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d1d1'}
+                >
+                  <option value="Organization perspective">Organization perspective</option>
+                  <option value="Individual perspective">Individual perspective</option>
+                </select>
+              </div>
             </div>
             
             <Button
@@ -519,80 +532,84 @@ const App = (props) => {
         )}
         {activeTab === 'suggestReply' && (
           <div style={{
-            padding: '12px 16px',
-            borderTop: '1px solid #e1e1e1',
-            marginTop: '8px',
-            backgroundColor: '#f0f0f0',
-            borderRadius: '4px',
+            padding: '8px',
             width: '100%',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+            borderRadius: '8px',
+            marginBottom: '8px'
           }}>
-            {/* Additional Instructions section - Hidden as per user request */}
-            {/* <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '14px', color: '#323130' }}>
-                Additional Instructions
-              </label>
-              <textarea
-                placeholder="Any additional instructions..."
-                value={emailForm.additionalInstructions}
-                onChange={(e) => setEmailForm({ ...emailForm, additionalInstructions: e.target.value })}
-                style={{
-                  width: '100%',
-                  minHeight: '60px',
-                  padding: '10px',
-                  border: '1px solid #d1d1d1',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  backgroundColor: '#ffffff',
-                  boxSizing: 'border-box'
-                }}
-              />
-            </div> */}
-            <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '14px', color: '#323130' }}>
-                Tone
-              </label>
-              <select
-                value={emailForm.tone}
-                onChange={(e) => setEmailForm({ ...emailForm, tone: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #d1d1d1',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  backgroundColor: '#ffffff',
-                  boxSizing: 'border-box',
-                  cursor: 'pointer'
-                }}
-              >
-                <option value="Formal">Formal</option>
-                <option value="Casual">Casual</option>
-                <option value="Professional">Professional</option>
-                <option value="Empathetic">Empathetic</option>
-              </select>
-            </div>
-            <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '14px', color: '#323130' }}>
-                Point of View
-              </label>
-              <select
-                value={emailForm.pointOfView}
-                onChange={(e) => setEmailForm({ ...emailForm, pointOfView: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #d1d1d1',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  backgroundColor: '#ffffff',
-                  boxSizing: 'border-box',
-                  cursor: 'pointer'
-                }}
-              >
-                <option value="Organization perspective">Organization perspective</option>
-                <option value="Individual perspective">Individual perspective</option>
-              </select>
+            <div style={{ 
+              display: 'flex', 
+              gap: '8px', 
+              marginBottom: '10px',
+              alignItems: 'flex-end'
+            }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ 
+                  display: 'block', 
+                  marginBottom: '3px', 
+                  fontWeight: '600', 
+                  fontSize: '14px', 
+                  color: '#323130' 
+                }}>
+                  Tone
+                </label>
+                <select
+                  value={emailForm.tone}
+                  onChange={(e) => setEmailForm({ ...emailForm, tone: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '6px',
+                    border: '1px solid #d1d1d1',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    backgroundColor: '#ffffff',
+                    boxSizing: 'border-box',
+                    cursor: 'pointer',
+                    outline: 'none'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#0078d4'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d1d1'}
+                >
+                  <option value="Formal">Formal</option>
+                  <option value="Casual">Casual</option>
+                  <option value="Professional">Professional</option>
+                  <option value="Empathetic">Empathetic</option>
+                </select>
+              </div>
+              
+              <div style={{ flex: 1 }}>
+                <label style={{ 
+                  display: 'block', 
+                  marginBottom: '3px', 
+                  fontWeight: '600', 
+                  fontSize: '14px', 
+                  color: '#323130' 
+                }}>
+                  Point of View
+                </label>
+                <select
+                  value={emailForm.pointOfView}
+                  onChange={(e) => setEmailForm({ ...emailForm, pointOfView: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '6px',
+                    border: '1px solid #d1d1d1',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    backgroundColor: '#ffffff',
+                    boxSizing: 'border-box',
+                    cursor: 'pointer',
+                    outline: 'none'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#0078d4'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d1d1'}
+                >
+                  <option value="Organization perspective">Organization perspective</option>
+                  <option value="Individual perspective">Individual perspective</option>
+                </select>
+              </div>
             </div>
             <Button
               appearance="primary"
@@ -600,11 +617,11 @@ const App = (props) => {
               disabled={loading}
               style={{ 
                 width: '100%',
-                padding: '10px 16px',
+                padding: '8px 16px',
                 fontSize: '15px',
                 fontWeight: '600',
                 borderRadius: '4px',
-                minHeight: '40px',
+                minHeight: '36px',
                 backgroundColor: '#0078d4',
                 color: '#ffffff',
                 border: 'none',
@@ -617,6 +634,10 @@ const App = (props) => {
         )}
         <div
           className={styles.contentArea}
+          style={{
+            overflowY: 'auto',
+            overflowX: 'hidden'
+          }}
           dangerouslySetInnerHTML={{
             __html: generatedContent
               ? generatedContent
@@ -627,13 +648,20 @@ const App = (props) => {
               : '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #605e5c; font-style: italic; text-align: center; padding: 30px;"><div><div style="font-size: 16px; margin-bottom: 6px;">✨ Your generated content will appear here</div><div style="font-size: 12px; opacity: 0.8;">Click a button above to get started</div></div></div>'
           }}
         />
-        {(activeTab === 'suggestReply' || (activeTab === 'writeEmail' && generatedContent && generatedContent !== "Generating..." && generatedContent !== "Generating email...")) && (
+        {(() => {
+          const shouldShow = (activeTab === 'suggestReply' || (activeTab === 'writeEmail' && generatedContent && !generatedContent.includes("Generating")));
+          console.log('Chat input should show:', shouldShow, 'activeTab:', activeTab, 'generatedContent:', generatedContent);
+          return shouldShow;
+        })() && (
           <div style={{
             display: 'flex',
             borderTop: '1px solid #e1e1e1',
             padding: '6px',
             alignItems: 'center',
-            margin: '2px 8px 0 8px'
+            margin: '2px 8px 0 8px',
+            backgroundColor: '#f9f9f9',
+            borderRadius: '4px',
+            flexShrink: 0
           }}>
             <input
               type="text"

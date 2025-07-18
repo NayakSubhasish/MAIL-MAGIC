@@ -15,7 +15,7 @@
     "build": "webpack --mode production",
     "build:dev": "webpack --mode development",
     "dev-server": "webpack serve --mode development",
-    "deploy": "npm run build && gh-pages -d dist",
+    "deploy": "npm run build && node deploy.js",
     "lint": "office-addin-lint check",
     "lint:fix": "office-addin-lint fix",
     "prettier": "office-addin-lint prettier",

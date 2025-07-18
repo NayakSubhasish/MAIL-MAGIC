@@ -28,7 +28,7 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://nayaksubhasish.github.io/OUTLOOK-PLUGIN/taskpane.html"/>
+        <SourceLocation DefaultValue="https://nayaksubhasish.github.io/MAIL-MAGIC/taskpane.html"/>
         <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
@@ -104,8 +104,8 @@
           <bt:Image id="Icon.80x80" DefaultValue="https://nayaksubhasish.github.io/MAIL-MAGIC/assets/logo.png"/>
         </bt:Images>
         <bt:Urls>
-          <bt:Url id="Commands.Url" DefaultValue="https://nayaksubhasish.github.io/OUTLOOK-PLUGIN/commands.html"/>
-          <bt:Url id="Taskpane.Url" DefaultValue="https://nayaksubhasish.github.io/OUTLOOK-PLUGIN/taskpane.html"/>
+          <bt:Url id="Commands.Url" DefaultValue="https://nayaksubhasish.github.io/MAIL-MAGIC/commands.html"/>
+          <bt:Url id="Taskpane.Url" DefaultValue="https://nayaksubhasish.github.io/MAIL-MAGIC/taskpane.html"/>
         </bt:Urls>
         <bt:ShortStrings>
           <bt:String id="GroupLabel" DefaultValue="Mail Magic"/>

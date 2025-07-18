@@ -11,7 +11,7 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    padding: "16px",
+    padding: "8px",
     boxSizing: "border-box",
     overflow: "hidden",
     scrollbarWidth: "none",
@@ -25,14 +25,14 @@ const useStyles = makeStyles({
     display: "flex",
     justifyContent: "flex-end",
     alignItems: "center",
-    padding: "0 16px",
+    padding: "0 8px",
     boxSizing: "border-box",
-    marginBottom: "16px",
+    marginBottom: "4px",
   },
   tabContainer: {
     width: "100%",
     maxWidth: "400px",
-    marginBottom: "10px",
+    marginBottom: "4px",
   },
     contentArea: {
     width: "100%",
@@ -654,60 +654,83 @@ const App = (props) => {
           return shouldShow;
         })() && (
           <div style={{
+            position: 'relative',
             display: 'flex',
-            borderTop: '1px solid #e1e1e1',
-            padding: '6px',
             alignItems: 'center',
-            margin: '2px 8px 0 8px',
-            backgroundColor: '#f9f9f9',
-            borderRadius: '4px',
-            flexShrink: 0
+            margin: '2px 0px',
+            flexShrink: 0,
+            width: '100%',
+            paddingLeft: '4px',
+            paddingRight: '4px',
+            boxSizing: 'border-box'
           }}>
             <input
               type="text"
-              placeholder="Type your prompt..."
+              placeholder="Type follow-up question here"
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleChatSend()}
               style={{
-                flex: 1,
-                padding: '8px 12px',
+                width: '100%',
+                padding: '8px 35px 8px 12px',
                 fontSize: '14px',
-                borderRadius: '18px',
+                borderRadius: '20px',
                 border: '1px solid #d1d1d1',
-                marginRight: '6px',
                 outline: 'none',
-                background: 'linear-gradient(145deg, #e8e8e8, #d4d4d4)',
+                backgroundColor: '#ffffff',
                 transition: 'all 0.3s ease',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                color: '#323130',
+                boxSizing: 'border-box',
+                height: '36px'
               }}
               onFocus={(e) => {
                 e.target.style.borderColor = '#0078d4';
-                e.target.style.background = 'linear-gradient(145deg, #f0f0f0, #e0e0e0)';
-                e.target.style.boxShadow = '0 4px 12px rgba(0,120,212,0.2)';
+                e.target.style.boxShadow = '0 0 0 2px rgba(0,120,212,0.2)';
               }}
               onBlur={(e) => {
                 e.target.style.borderColor = '#d1d1d1';
-                e.target.style.background = 'linear-gradient(145deg, #e8e8e8, #d4d4d4)';
-                e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                e.target.style.boxShadow = 'none';
               }}
             />
-            <Button
-              appearance="primary"
+            <button
               disabled={loading || !chatInput.trim()}
               onClick={handleChatSend}
               style={{
-                borderRadius: '18px',
-                minWidth: '55px',
-                padding: '8px 12px',
+                position: 'absolute',
+                right: '6px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                borderRadius: '50%',
+                width: '28px',
+                height: '28px',
                 backgroundColor: '#0078d4',
                 color: '#ffffff',
                 border: 'none',
-                opacity: (loading || !chatInput.trim()) ? 0.5 : 1
+                fontSize: '12px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                opacity: (loading || !chatInput.trim()) ? 0.5 : 1,
+                transition: 'all 0.3s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 1px 3px rgba(0,120,212,0.3)'
+              }}
+              onMouseEnter={(e) => {
+                if (!loading && chatInput.trim()) {
+                  e.target.style.backgroundColor = '#106ebe';
+                  e.target.style.transform = 'translateY(-50%) scale(1.05)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!loading && chatInput.trim()) {
+                  e.target.style.backgroundColor = '#0078d4';
+                  e.target.style.transform = 'translateY(-50%) scale(1)';
+                }
               }}
             >
-              {loading ? '...' : 'Send'}
-            </Button>
+              {loading ? '...' : '↑'}
+            </button>
           </div>
         )}
       </div>

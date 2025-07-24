@@ -33,9 +33,6 @@
     </Form>
   </FormSettings>
   <Permissions>ReadWriteItem</Permissions>
-  <ExtendedPermissions>
-    <ExtendedPermission>AppendOnSend</ExtendedPermission>
-  </ExtendedPermissions>
   <Rule xsi:type="RuleCollection" Mode="Or">
     <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read"/>
   </Rule>
@@ -43,7 +40,7 @@
   <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
     <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.1" xsi:type="VersionOverridesV1_1">
       <Requirements>
-        <bt:Sets DefaultMinVersion="1.10">
+        <bt:Sets DefaultMinVersion="1.8">
           <bt:Set Name="Mailbox"/>
         </bt:Sets>
       </Requirements>
@@ -51,12 +48,7 @@
         <Host xsi:type="MailHost">
           <DesktopFormFactor>
             <FunctionFile resid="Commands.Url"/>
-            <ExtensionPoint xsi:type="LaunchEvent">
-              <LaunchEvents>
-                <LaunchEvent Type="OnMessageSend" FunctionName="validateEmail" SendMode="PromptUser"/>
-              </LaunchEvents>
-              <SourceLocation resid="Commands.Url"/>
-            </ExtensionPoint>
+
             <ExtensionPoint xsi:type="MessageReadCommandSurface">
               <OfficeTab id="TabDefault">
                 <Group id="msgReadGroup">
@@ -98,6 +90,21 @@
                       <SourceLocation resid="Taskpane.Url"/>
                     </Action>
                   </Control>
+                  <Control xsi:type="Button" id="validateEmailButton">
+                    <Label resid="ValidateButton.Label"/>
+                    <Supertip>
+                      <Title resid="ValidateButton.Label"/>
+                      <Description resid="ValidateButton.Tooltip"/>
+                    </Supertip>
+                    <Icon>
+                      <bt:Image size="16" resid="Icon.16x16"/>
+                      <bt:Image size="32" resid="Icon.32x32"/>
+                      <bt:Image size="80" resid="Icon.80x80"/>
+                    </Icon>
+                    <Action xsi:type="ExecuteFunction">
+                      <FunctionName>validateEmailManual</FunctionName>
+                    </Action>
+                  </Control>
                 </Group>
               </OfficeTab>
             </ExtensionPoint>
@@ -118,9 +125,11 @@
         <bt:ShortStrings>
           <bt:String id="GroupLabel" DefaultValue="Mail Magic"/>
           <bt:String id="TaskpaneButton.Label" DefaultValue="Mail Magic"/>
+          <bt:String id="ValidateButton.Label" DefaultValue="Validate Email"/>
         </bt:ShortStrings>
         <bt:LongStrings>
           <bt:String id="TaskpaneButton.Tooltip" DefaultValue="AI-powered email assistant for sales professionals"/>
+          <bt:String id="ValidateButton.Tooltip" DefaultValue="Check email for missing keywords and enhance content"/>
         </bt:LongStrings>
       </Resources>
     </VersionOverrides>

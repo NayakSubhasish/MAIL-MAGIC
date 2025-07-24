@@ -195,6 +195,15 @@
                     const messageData = JSON.parse(event.data);
                     if (messageData.type === 'missing-keywords') {
                         missingKeywords = messageData.data;
+                        
+                        // Check if this is for send validation
+                        if (messageData.mode === 'send') {
+                            document.querySelector('.message').innerHTML = 
+                                'Your email is missing some important elements. Would you like to enhance it before sending?';
+                            document.querySelector('.btn-warning').textContent = 'Send Anyway';
+                            document.querySelector('.btn-primary').textContent = 'Enhance & Send';
+                        }
+                        
                         displayMissingKeywords();
                     }
                 } catch (error) {

@@ -106,6 +106,21 @@
                       <FunctionName>validateEmailManual</FunctionName>
                     </Action>
                   </Control>
+                  <Control xsi:type="Button" id="sendWithValidationButton">
+                    <Label resid="SendValidateButton.Label"/>
+                    <Supertip>
+                      <Title resid="SendValidateButton.Label"/>
+                      <Description resid="SendValidateButton.Tooltip"/>
+                    </Supertip>
+                    <Icon>
+                      <bt:Image size="16" resid="Icon.16x16"/>
+                      <bt:Image size="32" resid="Icon.32x32"/>
+                      <bt:Image size="80" resid="Icon.80x80"/>
+                    </Icon>
+                    <Action xsi:type="ExecuteFunction">
+                      <FunctionName>sendWithValidation</FunctionName>
+                    </Action>
+                  </Control>
                 </Group>
               </OfficeTab>
             </ExtensionPoint>
@@ -127,10 +142,12 @@
           <bt:String id="GroupLabel" DefaultValue="Mail Magic"/>
           <bt:String id="TaskpaneButton.Label" DefaultValue="Mail Magic"/>
           <bt:String id="ValidateButton.Label" DefaultValue="Validate Email"/>
+          <bt:String id="SendValidateButton.Label" DefaultValue="Send with Validation"/>
         </bt:ShortStrings>
         <bt:LongStrings>
           <bt:String id="TaskpaneButton.Tooltip" DefaultValue="AI-powered email assistant - Local Development"/>
           <bt:String id="ValidateButton.Tooltip" DefaultValue="Check email for missing keywords and enhance content"/>
+          <bt:String id="SendValidateButton.Tooltip" DefaultValue="Validate email for missing keywords, enhance if needed, then send"/>
         </bt:LongStrings>
       </Resources>
     </VersionOverrides>

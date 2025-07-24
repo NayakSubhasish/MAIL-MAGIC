@@ -34,6 +34,9 @@
     </Form>
   </FormSettings>
   <Permissions>ReadWriteItem</Permissions>
+  <ExtendedPermissions>
+    <ExtendedPermission>AppendOnSend</ExtendedPermission>
+  </ExtendedPermissions>
   <Rule xsi:type="RuleCollection" Mode="Or">
     <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read"/>
   </Rule>
@@ -51,7 +54,7 @@
             <FunctionFile resid="Commands.Url"/>
             <ExtensionPoint xsi:type="LaunchEvent">
               <LaunchEvents>
-                <LaunchEvent Type="OnMessageSend" FunctionName="validateEmail"/>
+                <LaunchEvent Type="OnMessageSend" FunctionName="validateEmail" SendMode="PromptUser"/>
               </LaunchEvents>
               <SourceLocation resid="Commands.Url"/>
             </ExtensionPoint>

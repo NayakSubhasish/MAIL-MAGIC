@@ -82,6 +82,10 @@ module.exports = async (env, options) => {
               }
             },
           },
+          {
+            from: "validation-dialog.html",
+            to: "validation-dialog.html",
+          },
         ],
       }),
       new HtmlWebpackPlugin({

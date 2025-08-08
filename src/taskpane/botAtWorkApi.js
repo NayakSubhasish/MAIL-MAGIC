@@ -27,51 +27,107 @@ const isRetryableError = (error) => {
 };
 
 // Helper function to determine task type and format payload
-const formatPayload = (prompt, taskType = 'emailWrite') => {
-  // For email writing tasks, try to extract structured data from prompt
+const formatPayload = (prompt, taskType = 'emailWrite', apiParams = {}) => {
+  // Extract dynamic parameters with defaults
+  const {
+    additionalInstructions = "",
+    tone = "formal",
+    pointOfView = "organizationPerspective",
+    description: apiDescription = null,
+    emailContent: apiEmailContent = null
+  } = apiParams;
+
+  console.log('BotAtWork API - formatPayload received apiParams:', apiParams);
+  console.log('BotAtWork API - Extracted parameters:', { tone, pointOfView, additionalInstructions });
+
+  // Clean and structure the prompt for better API understanding
+  const cleanPrompt = prompt.replace(/^(Write a professional email with the following details:|Suggest a professional reply to this email considering the specified tone and point of view:|Please provide a helpful response to this follow-up question or request:)/i, '').trim();
+
+  // For email writing tasks (new emails)
   if (taskType === 'emailWrite') {
-    // Extract description, tone, and point of view from the prompt
-    const descriptionMatch = prompt.match(/Description:\s*([^\n]+)/i);
-    const toneMatch = prompt.match(/Tone:\s*([^\n]+)/i);
-    const pointOfViewMatch = prompt.match(/Point of View:\s*([^\n]+)/i);
+    // Extract description from the prompt, but use dynamic tone and pointOfView
+    // Updated regex to capture multi-line descriptions by using [\s\S]*? (non-greedy match of any character including newlines)
+    const descriptionMatch = prompt.match(/Description:\s*([\s\S]*?)(?=\nTone:|$)/i);
     
+    // Always use the dynamic parameters for tone and pointOfView, not extracted from prompt
     return {
       chooseATask: "emailWrite",
-      description: descriptionMatch ? descriptionMatch[1].trim() : prompt,
-      additionalInstructions: "", // Removed as per user request
-      tone: toneMatch ? toneMatch[1].trim().toLowerCase() : "formal",
-      pointOfView: pointOfViewMatch ? pointOfViewMatch[1].trim().replace(/\s+/g, '').toLowerCase() : "organizationPerspective"
+      description: descriptionMatch ? descriptionMatch[1].trim() : (apiDescription != null ? apiDescription : cleanPrompt),
+      additionalInstructions: additionalInstructions || "Write a professional email that matches the specified tone and perspective exactly. Use 'we', 'our', 'us' for organization perspective and 'I', 'my', 'me' for individual perspective.",
+      tone: tone, // Always use the dynamic tone parameter
+      pointOfView: pointOfView === "individualPerspective" ? "firstPerson" : "organizationPerspective" // Map to API expected values
     };
   }
-  
-  // For other tasks (suggest reply, chat, etc.), use a generic approach
+
+  // For email response tasks (replies, suggestions, enhancements)
+  if (taskType === 'emailResponse') {
+    return {
+      chooseATask: "emailResponse",
+      emailContent: apiEmailContent != null ? apiEmailContent : cleanPrompt,
+      additionalInstructions: additionalInstructions || "Provide a relevant and contextual response that matches the specified tone and perspective. Use 'we', 'our', 'us' for organization perspective and 'I', 'my', 'me' for individual perspective.",
+      tone,
+      pointOfView: pointOfView === "individualPerspective" ? "firstPerson" : "organizationPerspective"
+    };
+  }
+
+  // For chat/conversation tasks
+  if (taskType === 'chat') {
+    return {
+      chooseATask: "emailWrite", // Use emailWrite for chat as it's more flexible
+      description: cleanPrompt,
+      additionalInstructions: additionalInstructions || "Provide a helpful and conversational response. Use 'we', 'our', 'us' for organization perspective and 'I', 'my', 'me' for individual perspective.",
+      tone,
+      pointOfView: pointOfView === "individualPerspective" ? "firstPerson" : "organizationPerspective"
+    };
+  }
+
+  // Default fallback
   return {
-    chooseATask: "emailWrite", // Default task type
-    description: prompt,
-    additionalInstructions: "",
-    tone: "formal",
-    pointOfView: "organizationPerspective"
+    chooseATask: "emailWrite",
+    description: apiDescription != null ? apiDescription : cleanPrompt,
+    additionalInstructions: additionalInstructions || "Write a professional email that matches the specified tone and perspective. Use 'we', 'our', 'us' for organization perspective and 'I', 'my', 'me' for individual perspective.",
+    tone,
+    pointOfView: pointOfView === "individualPerspective" ? "firstPerson" : "organizationPerspective"
   };
 };
 
-export async function getSuggestedReply(prompt, maxRetries = 3) {
-  // Determine task type based on prompt content
-  let taskType = 'emailWrite';
-  if (prompt.toLowerCase().includes('suggest') && prompt.toLowerCase().includes('reply')) {
-    taskType = 'suggestReply';
-  }
-  
-  const payload = formatPayload(prompt, taskType);
+export async function getSuggestedReply(prompt, maxRetries = 3, apiParams = {}) {
+  // Extract dynamic parameters with defaults
+  const {
+    chooseATask = "emailWrite",
+    description = prompt,
+    emailContent = prompt, // For emailResponse tasks
+    additionalInstructions = "",
+    tone = "formal",
+    pointOfView = "organizationPerspective",
+    anonymize = null,
+    incognito = false,
+    default_language = "en-US",
+    should_stream = false
+  } = apiParams;
+
+  // Create payload based on task type using formatPayload
+  const payload = formatPayload(prompt, chooseATask, apiParams);
   
   const requestBody = {
     data: {
       payload: payload
     },
-    anonymize: null,
-    incognito: false,
-    default_language: "en-US",
-    should_stream: false
+    anonymize,
+    incognito,
+    default_language,
+    should_stream
   };
+
+  console.log('BotAtWork API - Using dynamic parameters:', {
+    chooseATask,
+    tone,
+    pointOfView,
+    additionalInstructions,
+    default_language
+  });
+  
+  console.log('BotAtWork API - Final payload being sent:', JSON.stringify(payload, null, 2));
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {

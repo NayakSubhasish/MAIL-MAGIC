@@ -20,6 +20,45 @@ const useStyles = makeStyles({
       display: "none",
     },
   },
+  // Loading spinner styles
+  spinner: {
+    display: "inline-block",
+    width: "40px",
+    height: "40px",
+    border: "3px solid rgba(0, 120, 212, 0.3)",
+    borderRadius: "50%",
+    borderTopColor: "#0078d4",
+    animation: "$spin 1s ease-in-out infinite",
+  },
+  "@keyframes spin": {
+    to: {
+      transform: "rotate(360deg)",
+    },
+  },
+  // Global spin animation for button spinners
+  "@global": {
+    "@keyframes spin": {
+      to: {
+        transform: "rotate(360deg)",
+      },
+    },
+  },
+  loadingContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100%",
+    color: "#605e5c",
+    textAlign: "center",
+    padding: "30px",
+  },
+  loadingText: {
+    marginTop: "16px",
+    fontSize: "14px",
+    fontWeight: "500",
+    color: "#323130",
+  },
   headerContainer: {
     width: "100%",
     display: "flex",
@@ -31,13 +70,13 @@ const useStyles = makeStyles({
   },
   tabContainer: {
     width: "100%",
-    maxWidth: "400px",
+    maxWidth: "500px",
     marginBottom: "4px",
   },
-    contentArea: {
+  contentArea: {
     width: "100%",
     minHeight: "200px",
-    maxHeight: "400px",
+    maxHeight: "60vh", // Use viewport height for better responsiveness
     background: "linear-gradient(145deg, #e8e8e8, #d4d4d4)",
     borderRadius: "8px",
     padding: "16px",
@@ -46,14 +85,30 @@ const useStyles = makeStyles({
     lineHeight: "1.7",
     boxShadow: "0 4px 20px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.15)",
     wordBreak: "break-word",
-    overflow: "hidden",
+    overflowY: "auto", // Enable vertical scrolling
+    overflowX: "hidden", // Hide horizontal overflow
     flex: "1 1 auto",
-    display: "flex",
-    flexDirection: "column",
+    display: "block", // Changed from flex to block for better text flow
     border: "1px solid rgba(0,0,0,0.12)",
     margin: "4px 8px 4px 8px",
     transition: "all 0.3s ease",
     maxWidth: "none",
+    // Custom scrollbar styling for better UX
+    scrollbarWidth: "thin",
+    scrollbarColor: "rgba(0,0,0,0.3) transparent",
+    "&::-webkit-scrollbar": {
+      width: "6px",
+    },
+    "&::-webkit-scrollbar-track": {
+      background: "transparent",
+    },
+    "&::-webkit-scrollbar-thumb": {
+      backgroundColor: "rgba(0,0,0,0.3)",
+      borderRadius: "3px",
+    },
+    "&::-webkit-scrollbar-thumb:hover": {
+      backgroundColor: "rgba(0,0,0,0.5)",
+    },
     "&:hover": {
       boxShadow: "0 8px 30px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.15)",
     },
@@ -104,18 +159,21 @@ const App = (props) => {
   const [emailForm, setEmailForm] = React.useState({
     description: "",
     // additionalInstructions: "", // Commented out as per user request
-    tone: "Formal",
+    tone: "formal",
     pointOfView: "Organization perspective"
   });
+
   // const [isDarkMode, setIsDarkMode] = React.useState(false); // dark mode temporarily disabled
   const [customPrompts, setCustomPrompts] = React.useState({
-    suggestReply: "Suggest a professional reply to this email considering the specified tone and point of view:\n\nEmail to reply to:\n{emailBody}\n\nResponse Requirements:\nTone: {tone}\nPoint of View: {pointOfView}\n\nPlease craft a reply that matches the specified tone and perspective.",
+    suggestReply: "Email to reply to:\n{emailBody}\n\nWrite a professional reply with:\nTone: {tone}\nPoint of View: {pointOfView}",
     summarize: "Summarize this email in 2 sentences:\n{emailBody}",
-    writeEmail: "Write a professional email with the following details:\nDescription: {description}\nTone: {tone}\nPoint of View: {pointOfView}",
+    writeEmail: "Write a professional email:\nDescription: {description}\nTone: {tone}\nPoint of View: {pointOfView}",
   });
   const [chatInput, setChatInput] = React.useState("");
   const [chatHistory, setChatHistory] = React.useState([]);
   const [isFirstResponse, setIsFirstResponse] = React.useState(true);
+  const [showEnhanceButton, setShowEnhanceButton] = React.useState(false);
+  const [missingKeywords, setMissingKeywords] = React.useState([]);
 
   // Responsive header style
   const headerTitle = "SalesGenie AI";
@@ -149,6 +207,39 @@ const App = (props) => {
           });
         } else {
           reject("Unsupported item type.");
+        }
+      } else {
+        reject("Office.js not available or not in Outlook context.");
+      }
+    });
+  };
+
+  // Helper to get email subject
+  let getEmailSubject = () => {
+    return new Promise((resolve, reject) => {
+      if (window.Office && Office.context && Office.context.mailbox && Office.context.mailbox.item) {
+        const item = Office.context.mailbox.item;
+        
+        // For compose mode, use subject.getAsync
+        if (item.itemType === Office.MailboxEnums.ItemType.Message && item.subject && item.subject.getAsync) {
+          item.subject.getAsync((result) => {
+            if (result.status === Office.AsyncResultStatus.Succeeded) {
+              resolve(result.value || "No subject");
+            } else {
+              resolve("No subject");
+            }
+          });
+        } 
+        // For read mode, subject might be directly available
+        else if (typeof item.subject === 'string') {
+          resolve(item.subject);
+        }
+        // Fallback - try to get from normalizedSubject
+        else if (item.normalizedSubject) {
+          resolve(item.normalizedSubject);
+        }
+        else {
+          resolve("No subject");
         }
       } else {
         reject("Office.js not available or not in Outlook context.");
@@ -194,31 +285,292 @@ const App = (props) => {
       
       console.log("prompt", prompt);
       
-      // Monitor for retry attempts
+      // Monitor for retry attempts (silent)
       let retryCount = 0;
       const originalLog = console.log;
       console.log = (...args) => {
         if (args[0] && args[0].includes && args[0].includes('BotAtWork API attempt')) {
           retryCount++;
-          if (retryCount > 1) {
-            setGeneratedContent(`Generating... (API busy, retrying - attempt ${retryCount})`);
-          }
+          // Keep the loading message clean - no retry status shown to user
         }
         originalLog.apply(console, args);
       };
       
-      const reply = await getSuggestedReply(prompt);
+      // Use emailResponse for reply suggestions with proper structured parameters
+      const apiParams = {
+        chooseATask: "emailResponse",
+        emailContent: contextWithThread, // Pass the actual email content, not the formatted prompt
+        tone: emailForm.tone.toLowerCase() || "formal",
+        pointOfView: emailForm.pointOfView === "Individual perspective" ? "individualPerspective" : "organizationPerspective",
+        additionalInstructions: ""
+      };
+      
+      const reply = await getSuggestedReply(contextWithThread, 3, apiParams);
       
       // Restore original console.log
       console.log = originalLog;
       
       setGeneratedContent(reply);
     } catch (e) {
-      setGeneratedContent("Error: " + e);
+      // Show API error messages as-is, they're already properly formatted
+      const errorMessage = e.toString();
+      setGeneratedContent(errorMessage.startsWith('API error:') || errorMessage.startsWith('Error calling BotAtWork API:') ? errorMessage : `Error: ${errorMessage}`);
     }
     setLoading(false);
   };
 
+  // Email validation function that can be called from taskpane
+  const validateCurrentEmail = async () => {
+    setLoading(true);
+    setGeneratedContent("Validating email content...");
+    
+    try {
+      const emailBody = await getEmailBody();
+      const emailSubject = await getEmailSubject();
+      const missing = await checkMissingKeywords(emailBody, emailSubject);
+      
+      if (missing.length > 0) {
+        // Show validation results in the taskpane
+        setGeneratedContent(`
+          <div style="color: #d13438; font-weight: bold; margin-bottom: 16px;">
+            ⚠️ Missing Important Elements Detected
+          </div>
+          <div style="background: #fff4ce; border: 1px solid #ffb900; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
+            <div style="margin-bottom: 8px;"><strong>Email Subject:</strong> ${emailSubject}</div>
+            <div style="margin-bottom: 12px;"><strong>Missing Elements:</strong></div>
+            <ul style="margin: 8px 0; padding-left: 20px;">
+              ${missing.map(item => `<li><strong>${item.category}</strong>: Consider adding ${item.suggestions.join(', ')}</li>`).join('')}
+            </ul>
+          </div>
+          <div style="color: #605e5c; font-size: 14px;">
+            <strong>Recommendations:</strong><br/>
+            • Click "Generate Enhanced Response" below to automatically add missing elements<br/>
+            • Or manually add these elements to your email before sending
+          </div>
+        `);
+        
+        // Show enhance button
+        setShowEnhanceButton(true);
+        setMissingKeywords(missing);
+      } else {
+        setGeneratedContent(`
+          <div style="color: #107c10; font-weight: bold; margin-bottom: 16px;">
+            ✅ Email Validation Passed!
+          </div>
+          <div style="background: #f3f9f1; border: 1px solid #107c10; padding: 12px; border-radius: 4px;">
+            <div style="margin-bottom: 8px;"><strong>Email Subject:</strong> ${emailSubject}</div>
+            <div>Your email contains all important elements and is ready to send.</div>
+          </div>
+        `);
+        setShowEnhanceButton(false);
+      }
+    } catch (error) {
+      setGeneratedContent(`Error validating email: ${error.message}`);
+    }
+    
+    setLoading(false);
+  };
+
+  // Check for missing keywords in both subject and body
+  const checkMissingKeywords = async (emailBody, emailSubject = "") => {
+    const REQUIRED_KEYWORDS = {
+      urgency: {
+        keywords: ['urgent', 'asap', 'immediate', 'critical', 'priority', 'important'],
+        category: 'Urgency Indicators',
+        suggestions: ['urgent', 'important', 'priority', 'asap'],
+        checkSubject: true
+      },
+      action: {
+        keywords: ['action item', 'action required', 'next steps', 'follow up', 'todo', 'please', 'request'],
+        category: 'Action Items',
+        suggestions: ['action items', 'next steps', 'follow-up required', 'please review'],
+        checkSubject: true
+      },
+      timeline: {
+        keywords: ['deadline', 'due date', 'timeline', 'schedule', 'by when', 'when', 'date', 'time'],
+        category: 'Timeline',
+        suggestions: ['deadline', 'timeline', 'completion date', 'by [date]'],
+        checkSubject: true
+      },
+      participants: {
+        keywords: ['attendees', 'participants', 'who should attend', 'invitees', 'team', 'members'],
+        category: 'Participants',
+        suggestions: ['attendees', 'participants', 'invitees', 'team members'],
+        checkSubject: false
+      },
+      greeting: {
+        keywords: ['dear', 'hello', 'hi', 'good morning', 'good afternoon', 'greetings'],
+        category: 'Greeting',
+        suggestions: ['Dear', 'Hello', 'Hi', 'Good morning'],
+        checkSubject: false
+      },
+      closing: {
+        keywords: ['regards', 'best regards', 'sincerely', 'thank you', 'thanks', 'appreciate'],
+        category: 'Closing',
+        suggestions: ['Best regards', 'Thank you', 'Sincerely', 'Appreciate your time'],
+        checkSubject: false
+      },
+      context: {
+        keywords: ['regarding', 'about', 'concerning', 're:', 'subject', 'topic'],
+        category: 'Context Clarity',
+        suggestions: ['regarding', 'about', 'concerning'],
+        checkSubject: true
+      },
+      meeting: {
+        keywords: ['meeting', 'agenda', 'discussion', 'call', 'conference', 'presentation'],
+        category: 'Meeting Elements',
+        suggestions: ['meeting agenda', 'discussion points', 'call details'],
+        checkSubject: true
+      }
+    };
+
+    const bodyText = emailBody.toLowerCase();
+    const subjectText = String(emailSubject || ""); // Ensure subject is a string
+    const missing = [];
+    
+    Object.keys(REQUIRED_KEYWORDS).forEach(key => {
+      const keywordData = REQUIRED_KEYWORDS[key];
+      let hasKeyword = false;
+      
+      // Check body text
+      hasKeyword = keywordData.keywords.some(keyword => 
+        bodyText.includes(keyword.toLowerCase())
+      );
+      
+      // If not found in body and should check subject, check subject
+      if (!hasKeyword && keywordData.checkSubject) {
+        hasKeyword = keywordData.keywords.some(keyword => 
+          subjectText.toLowerCase().includes(keyword.toLowerCase())
+        );
+      }
+      
+      if (!hasKeyword) {
+        missing.push({
+          category: keywordData.category,
+          suggestions: keywordData.suggestions,
+          key: key
+        });
+      }
+    });
+    
+    return missing;
+  };
+
+  // Generate enhanced email with missing keywords
+  const generateEnhancedEmail = async () => {
+    if (!missingKeywords || missingKeywords.length === 0) return;
+    
+    setLoading(true);
+    setGeneratedContent("Enhancing email with missing keywords...");
+    
+    try {
+      const currentBody = await getEmailBody();
+      const emailSubject = await getEmailSubject();
+      
+      // Get all missing keywords and their categories
+      const missingElements = missingKeywords.map(item => ({
+        category: item.category,
+        keywords: item.suggestions.slice(0, 2) // Take first 2 suggestions from each category
+      }));
+      
+      const missingElementsText = missingElements.map(item => 
+        `${item.category}: ${item.keywords.join(', ')}`
+      ).join('\n');
+      
+      const enhancementPrompt = `Please enhance this email by naturally incorporating these missing elements:
+
+Email Subject: ${emailSubject}
+
+Missing Elements to Add:
+${missingElementsText}
+
+Original Email Content:
+${currentBody}
+
+Instructions:
+- Keep the original tone and intent
+- Naturally integrate the missing elements throughout the email
+- Make it professional and coherent
+- Don't change the core message, just enhance it with the missing elements
+- Ensure the enhanced email flows naturally and maintains readability
+- Use proper paragraph breaks and formatting
+- Include appropriate spacing between sections
+- Format the email with clear structure (greeting, body, closing)
+
+Enhanced email:`;
+
+      // Use emailWrite for generating a new enhanced email
+      const apiParams = {
+        chooseATask: "emailWrite",
+        description: enhancementPrompt,
+        tone: emailForm.tone.toLowerCase() || "formal",
+        pointOfView: emailForm.pointOfView === "Individual perspective" ? "individualPerspective" : "organizationPerspective",
+        additionalInstructions: ""
+      };
+      
+      const enhancedContent = await getSuggestedReply(enhancementPrompt, 3, apiParams);
+      
+      // Update the email body in Outlook with proper HTML formatting
+      if (window.Office && Office.context && Office.context.mailbox && Office.context.mailbox.item) {
+        // Convert plain text to HTML with proper formatting
+        const formattedContent = enhancedContent
+          .trim() // Remove leading/trailing whitespace
+          .replace(/\n\n+/g, '</p><p>') // Multiple line breaks become paragraph breaks
+          .replace(/\n/g, '<br/>') // Single line breaks become <br/>
+          .replace(/^(.+)$/s, '<p>$1</p>') // Wrap entire content in paragraph tags
+          .replace(/<p><\/p>/g, '') // Remove empty paragraphs
+          .replace(/<p><p>/g, '<p>') // Fix double paragraph tags
+          .replace(/<\/p><\/p>/g, '</p>'); // Fix double closing paragraph tags
+        
+        Office.context.mailbox.item.body.setAsync(
+          formattedContent,
+          { coercionType: Office.CoercionType.Html },
+          (result) => {
+            if (result.status === Office.AsyncResultStatus.Succeeded) {
+              setGeneratedContent(`
+                <div style="color: #107c10; font-weight: bold; margin-bottom: 16px;">
+                  ✅ Email Enhanced Successfully!
+                </div>
+                <div style="background: #f3f9f1; border: 1px solid #107c10; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
+                  <div style="margin-bottom: 8px;"><strong>Email Subject:</strong> ${emailSubject}</div>
+                  <div>Your email has been updated with the missing keywords. Please review the changes in your email composer and send when ready.</div>
+                </div>
+                <div style="background: #f8f9fa; border: 1px solid #d1d1d1; padding: 12px; border-radius: 4px;">
+                  <strong>Enhanced Content Preview:</strong><br/>
+                  ${enhancedContent.replace(/\n/g, '<br/>')}
+                </div>
+              `);
+              setShowEnhanceButton(false);
+            } else {
+              setGeneratedContent("Failed to update email. Please copy the enhanced content manually.");
+            }
+          }
+        );
+      } else {
+        setGeneratedContent(`
+          <div style="color: #107c10; font-weight: bold; margin-bottom: 16px;">
+            ✅ Enhanced Email Generated!
+          </div>
+          <div style="background: #f8f9fa; border: 1px solid #d1d1d1; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
+            <div style="margin-bottom: 8px;"><strong>Email Subject:</strong> ${emailSubject}</div>
+            <strong>Enhanced Content:</strong><br/>
+            ${enhancedContent.replace(/\n/g, '<br/>')}
+          </div>
+          <div style="margin-top: 12px; color: #605e5c; font-size: 14px;">
+            Please copy this enhanced content to your email.
+          </div>
+        `);
+      }
+    } catch (error) {
+      setGeneratedContent(`Error enhancing email: ${error.message}`);
+    }
+    
+    setLoading(false);
+  };
+
+
+
+  // Chat input send handler: send direct prompt to LLM
   // Chat input send handler: send direct prompt to LLM
   const handleChatSend = async () => {
     if (!chatInput.trim()) return;
@@ -234,32 +586,41 @@ const App = (props) => {
     
     try {
       let prompt;
-      if (isFirstResponse && generatedContent && generatedContent !== "Generating...") {
+      if (isFirstResponse && generatedContent && generatedContent !== "Generating..." && !generatedContent.includes("Validating") && !generatedContent.includes("✨ Your generated content will appear here")) {
         // If there's existing content, include it in context
-        prompt = `Based on this previous response: "${generatedContent}"\n\nUser request: ${userMessage}`;
+        prompt = `Context: I previously provided this content/response: "${generatedContent.replace(/<[^>]*>/g, '').substring(0, 500)}..."\n\nNow the user is asking: ${userMessage}\n\nPlease respond helpfully to their follow-up question.`;
         setIsFirstResponse(false);
       } else {
         // Build context from chat history
-        const context = chatHistory.map(msg => 
-          msg.type === 'user' ? `User: ${msg.content}` : `Assistant: ${msg.content}`
+        const context = chatHistory.filter(msg => msg.content && msg.content.trim()).map(msg => 
+          msg.type === 'user' ? `User: ${msg.content}` : `Assistant: ${msg.content.replace(/<[^>]*>/g, '').substring(0, 300)}`
         ).join('\n');
-        prompt = context ? `${context}\nUser: ${userMessage}` : userMessage;
+        prompt = context ? `Previous conversation:\n${context}\n\nUser's new question: ${userMessage}\n\nPlease provide a helpful response.` : `User question: ${userMessage}\n\nPlease provide a helpful response.`;
       }
       
-      // Monitor for retry attempts
+      // Monitor for retry attempts (silent)
       let retryCount = 0;
       const originalLog = console.log;
       console.log = (...args) => {
         if (args[0] && args[0].includes && args[0].includes('BotAtWork API attempt')) {
           retryCount++;
-          if (retryCount > 1) {
-            setGeneratedContent(`Processing... (API busy, retrying - attempt ${retryCount})`);
-          }
+          // Keep the loading message clean - no retry status shown to user
         }
         originalLog.apply(console, args);
       };
       
-      const reply = await getSuggestedReply(prompt);
+      // Use chat task type for conversational interactions
+      const contextualPrompt = `${prompt}`;
+      
+      const apiParams = {
+        chooseATask: "chat",
+        description: contextualPrompt,
+        tone: emailForm.tone.toLowerCase() || "formal",
+        pointOfView: emailForm.pointOfView === "Individual perspective" ? "individualPerspective" : "organizationPerspective",
+        additionalInstructions: "Provide a helpful and conversational response to the user's question or request."
+      };
+      
+      const reply = await getSuggestedReply(contextualPrompt, 3, apiParams);
       
       // Restore original console.log
       console.log = originalLog;
@@ -271,7 +632,9 @@ const App = (props) => {
       // Update the main content area with latest response
       setGeneratedContent(reply);
     } catch (e) {
-      const errorMessage = "Error: " + e;
+      // Show API error messages as-is, they're already properly formatted
+      const errorString = e.toString();
+      const errorMessage = errorString.startsWith('API error:') || errorString.startsWith('Error calling BotAtWork API:') ? errorString : `Error: ${errorString}`;
       setChatHistory(prev => [...prev, { type: 'ai', content: errorMessage }]);
       setGeneratedContent(errorMessage);
     }
@@ -282,16 +645,25 @@ const App = (props) => {
   const handleTabSelect = (event, data) => {
     setActiveTab(data.value);
     if (data.value === 'writeEmail') {
-    setShowWriteEmailForm(true);
+      setShowWriteEmailForm(true);
       setChatHistory([]);
       setIsFirstResponse(true);
-    setGeneratedContent("");
+      setGeneratedContent("");
+      setShowEnhanceButton(false);
     } else if (data.value === 'suggestReply') {
       setShowWriteEmailForm(false);
       setChatHistory([]);
       setIsFirstResponse(true);
-      callGemini(customPrompts.suggestReply);
-    }
+      setShowEnhanceButton(false);
+      // Removed automatic API call - let users manually trigger when ready
+      setGeneratedContent("");
+    } 
+    /* else if (data.value === 'validate') {
+      setShowWriteEmailForm(false);
+      setChatHistory([]);
+      setIsFirstResponse(true);
+      validateCurrentEmail();
+    } */
   };
   const handleGenerateEmail = async () => {
     if (!emailForm.description.trim()) {
@@ -309,20 +681,27 @@ const App = (props) => {
     setGeneratedContent("Generating email...");
     
     try {
-      // Monitor for retry attempts by intercepting console logs
+      // Monitor for retry attempts (silent)
       let retryCount = 0;
       const originalLog = console.log;
       console.log = (...args) => {
         if (args[0] && args[0].includes && args[0].includes('BotAtWork API attempt')) {
           retryCount++;
-          if (retryCount > 1) {
-            setGeneratedContent(`Generating email... (API busy, retrying - attempt ${retryCount})`);
-          }
+          // Keep the loading message clean - no retry status shown to user
         }
         originalLog.apply(console, args);
       };
       
-      const reply = await getSuggestedReply(prompt);
+      // Use emailWrite for creating new emails
+      const apiParams = {
+        chooseATask: "emailWrite",
+        description: prompt,
+        tone: emailForm.tone.toLowerCase() || "formal",
+        pointOfView: emailForm.pointOfView === "Individual perspective" ? "individualPerspective" : "organizationPerspective",
+        additionalInstructions: ""
+      };
+      
+      const reply = await getSuggestedReply(prompt, 3, apiParams);
       
       // Restore original console.log
       console.log = originalLog;
@@ -330,7 +709,9 @@ const App = (props) => {
       setGeneratedContent(reply);
       setLoading(false);
     } catch (e) {
-      setGeneratedContent("Error: " + e);
+      // Show API error messages as-is, they're already properly formatted
+      const errorMessage = e.toString();
+      setGeneratedContent(errorMessage.startsWith('API error:') || errorMessage.startsWith('Error calling BotAtWork API:') ? errorMessage : `Error: ${errorMessage}`);
       setLoading(false);
     }
   };
@@ -361,15 +742,16 @@ const App = (props) => {
     <FluentProvider theme={teamsLightTheme}> {/* dark mode disabled for now */}
       <div className={styles.root}>
         <div className={styles.tabContainer}>
-          <TabList selectedValue={activeTab} onTabSelect={handleTabSelect}>
-            <Tab value="writeEmail">Write Email</Tab>
-            <Tab value="suggestReply">Suggest Reply</Tab>
+          <TabList selectedValue={activeTab} onTabSelect={handleTabSelect} style={{ width: '100%', display: 'flex' }}>
+                          <Tab value="writeEmail" style={{ flex: '1 1 0', fontSize: '12px', padding: '8px 4px', textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden' }}>Write Email</Tab>
+              <Tab value="suggestReply" style={{ flex: '1 1 0', fontSize: '12px', padding: '8px 4px', textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden' }}>Suggest Reply</Tab>
+              {/* <Tab value="validate" style={{ flex: '1 1 0', fontSize: '12px', padding: '8px 4px', textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden' }}>Validate</Tab> */}
           </TabList>
         </div>
         
         {showWriteEmailForm && (
-          <div style={{
-            padding: '8px',
+          <div style={{ 
+            padding: '8px', 
             width: '100%',
             boxSizing: 'border-box',
             background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
@@ -446,67 +828,67 @@ const App = (props) => {
               alignItems: 'flex-end'
             }}>
               <div style={{ flex: 1 }}>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '3px', 
-                  fontWeight: '600',
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '3px', 
+                fontWeight: '600',
+                fontSize: '14px',
+                color: '#323130'
+              }}>Tone *</label>
+              <select
+                value={emailForm.tone}
+                onChange={(e) => setEmailForm({...emailForm, tone: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '6px',
+                  border: '1px solid #d1d1d1',
+                  borderRadius: '4px',
                   fontSize: '14px',
-                  color: '#323130'
-                }}>Tone *</label>
-                <select
-                  value={emailForm.tone}
-                  onChange={(e) => setEmailForm({...emailForm, tone: e.target.value})}
-                  style={{
-                    width: '100%',
-                    padding: '6px',
-                    border: '1px solid #d1d1d1',
-                    borderRadius: '4px',
-                    fontSize: '14px',
-                    fontFamily: 'inherit',
-                    backgroundColor: '#ffffff',
-                    boxSizing: 'border-box',
-                    outline: 'none',
-                    cursor: 'pointer'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#0078d4'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d1d1'}
-                >
-                  <option value="Formal">Formal</option>
-                  <option value="Casual">Casual</option>
-                  <option value="Professional">Professional</option>
-                  <option value="Empathetic">Empathetic</option>
-                </select>
-              </div>
-              
+                  fontFamily: 'inherit',
+                  backgroundColor: '#ffffff',
+                  boxSizing: 'border-box',
+                  outline: 'none',
+                  cursor: 'pointer'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#0078d4'}
+                onBlur={(e) => e.target.style.borderColor = '#d1d1d1'}
+              >
+                <option value="formal">Formal</option>
+                <option value="casual">Casual</option>
+                <option value="professional">Professional</option>
+                <option value="empathetic">Empathetic</option>
+              </select>
+            </div>
+            
               <div style={{ flex: 1 }}>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '3px', 
-                  fontWeight: '600',
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '3px', 
+                fontWeight: '600',
+                fontSize: '14px',
+                color: '#323130'
+              }}>Point of View *</label>
+              <select
+                value={emailForm.pointOfView}
+                onChange={(e) => setEmailForm({...emailForm, pointOfView: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '6px',
+                  border: '1px solid #d1d1d1',
+                  borderRadius: '4px',
                   fontSize: '14px',
-                  color: '#323130'
-                }}>Point of View *</label>
-                <select
-                  value={emailForm.pointOfView}
-                  onChange={(e) => setEmailForm({...emailForm, pointOfView: e.target.value})}
-                  style={{
-                    width: '100%',
-                    padding: '6px',
-                    border: '1px solid #d1d1d1',
-                    borderRadius: '4px',
-                    fontSize: '14px',
-                    fontFamily: 'inherit',
-                    backgroundColor: '#ffffff',
-                    boxSizing: 'border-box',
-                    outline: 'none',
-                    cursor: 'pointer'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#0078d4'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d1d1'}
-                >
-                  <option value="Organization perspective">Organization perspective</option>
-                  <option value="Individual perspective">Individual perspective</option>
-                </select>
+                  fontFamily: 'inherit',
+                  backgroundColor: '#ffffff',
+                  boxSizing: 'border-box',
+                  outline: 'none',
+                  cursor: 'pointer'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#0078d4'}
+                onBlur={(e) => e.target.style.borderColor = '#d1d1d1'}
+              >
+                <option value="Organization perspective">Organization perspective</option>
+                <option value="Individual perspective">Individual perspective</option>
+              </select>
               </div>
             </div>
             
@@ -526,7 +908,19 @@ const App = (props) => {
                 border: emailForm.description.trim() ? 'none' : '1px solid #d1d1d1'
               }}
             >
-              {loading ? 'Generating...' : 'Generate Email'}
+              {loading ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  <div style={{
+                    width: '16px',
+                    height: '16px',
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    borderRadius: '50%',
+                    borderTopColor: '#ffffff',
+                    animation: 'spin 1s ease-in-out infinite'
+                  }}></div>
+                  <span>Generating...</span>
+                </div>
+              ) : 'Generate Email'}
             </Button>
           </div>
         )}
@@ -550,34 +944,34 @@ const App = (props) => {
                   display: 'block', 
                   marginBottom: '3px', 
                   fontWeight: '600', 
-                  fontSize: '14px', 
+                  fontSize: '14px',
                   color: '#323130' 
                 }}>
-                  Tone
-                </label>
-                <select
-                  value={emailForm.tone}
-                  onChange={(e) => setEmailForm({ ...emailForm, tone: e.target.value })}
-                  style={{
-                    width: '100%',
+                Tone
+              </label>
+              <select
+                value={emailForm.tone}
+                onChange={(e) => setEmailForm({ ...emailForm, tone: e.target.value })}
+                style={{
+                  width: '100%',
                     padding: '6px',
-                    border: '1px solid #d1d1d1',
-                    borderRadius: '4px',
-                    fontSize: '14px',
-                    backgroundColor: '#ffffff',
-                    boxSizing: 'border-box',
+                  border: '1px solid #d1d1d1',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  backgroundColor: '#ffffff',
+                  boxSizing: 'border-box',
                     cursor: 'pointer',
                     outline: 'none'
-                  }}
+                }}
                   onFocus={(e) => e.target.style.borderColor = '#0078d4'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d1d1'}
-                >
-                  <option value="Formal">Formal</option>
-                  <option value="Casual">Casual</option>
-                  <option value="Professional">Professional</option>
-                  <option value="Empathetic">Empathetic</option>
-                </select>
-              </div>
+              >
+                <option value="formal">Formal</option>
+                <option value="casual">Casual</option>
+                <option value="professional">Professional</option>
+                <option value="empathetic">Empathetic</option>
+              </select>
+            </div>
               
               <div style={{ flex: 1 }}>
                 <label style={{ 
@@ -587,28 +981,28 @@ const App = (props) => {
                   fontSize: '14px', 
                   color: '#323130' 
                 }}>
-                  Point of View
-                </label>
-                <select
-                  value={emailForm.pointOfView}
-                  onChange={(e) => setEmailForm({ ...emailForm, pointOfView: e.target.value })}
-                  style={{
-                    width: '100%',
+                Point of View
+              </label>
+              <select
+                value={emailForm.pointOfView}
+                onChange={(e) => setEmailForm({ ...emailForm, pointOfView: e.target.value })}
+                style={{
+                  width: '100%',
                     padding: '6px',
-                    border: '1px solid #d1d1d1',
-                    borderRadius: '4px',
-                    fontSize: '14px',
-                    backgroundColor: '#ffffff',
-                    boxSizing: 'border-box',
+                  border: '1px solid #d1d1d1',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  backgroundColor: '#ffffff',
+                  boxSizing: 'border-box',
                     cursor: 'pointer',
                     outline: 'none'
-                  }}
+                }}
                   onFocus={(e) => e.target.style.borderColor = '#0078d4'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d1d1'}
-                >
-                  <option value="Organization perspective">Organization perspective</option>
-                  <option value="Individual perspective">Individual perspective</option>
-                </select>
+              >
+                <option value="Organization perspective">Organization perspective</option>
+                <option value="Individual perspective">Individual perspective</option>
+              </select>
               </div>
             </div>
             <Button
@@ -628,28 +1022,144 @@ const App = (props) => {
                 opacity: loading ? 0.5 : 1
               }}
             >
-              {loading ? 'Generating...' : 'Generate New Reply'}
+              {loading ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  <div style={{
+                    width: '16px',
+                    height: '16px',
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    borderRadius: '50%',
+                    borderTopColor: '#ffffff',
+                    animation: 'spin 1s ease-in-out infinite'
+                  }}></div>
+                  <span>Generating...</span>
+                </div>
+              ) : 'Generate New Reply'}
             </Button>
           </div>
         )}
-        <div
-          className={styles.contentArea}
-          style={{
-            overflowY: 'auto',
-            overflowX: 'hidden'
-          }}
-          dangerouslySetInnerHTML={{
-            __html: generatedContent
-              ? generatedContent
-                  .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>') // links clickable
-                  .replace(/\n/g, '<br>') // preserve line breaks
-                  .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>') // bold for **text**
-                  .replace(/\*(.*?)\*/g, '<i>$1</i>') // italics for *text*
-              : '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #605e5c; font-style: italic; text-align: center; padding: 30px;"><div><div style="font-size: 16px; margin-bottom: 6px;">✨ Your generated content will appear here</div><div style="font-size: 12px; opacity: 0.8;">Click a button above to get started</div></div></div>'
-          }}
-        />
+
+        {/* Validate tab content - temporarily hidden
+        {activeTab === 'validate' && (
+          <div style={{
+            padding: '8px',
+            width: '100%',
+            boxSizing: 'border-box',
+            background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+            borderRadius: '8px',
+            marginBottom: '8px'
+          }}>
+            <div style={{
+              textAlign: 'center',
+              marginBottom: '12px'
+            }}>
+              <h3 style={{
+                margin: '0 0 8px 0',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#323130'
+              }}>Email Validation</h3>
+              <p style={{
+                margin: '0',
+                fontSize: '14px',
+                color: '#605e5c',
+                lineHeight: '1.4'
+              }}>Check if your email contains all important elements</p>
+            </div>
+            <Button
+              appearance="primary"
+              onClick={validateCurrentEmail}
+              disabled={loading}
+              style={{ 
+                width: '100%',
+                padding: '8px 16px',
+                fontSize: '15px',
+                fontWeight: '600',
+                borderRadius: '4px',
+                minHeight: '36px',
+                backgroundColor: '#0078d4',
+                color: '#ffffff',
+                border: 'none',
+                opacity: loading ? 0.5 : 1
+              }}
+            >
+              {loading ? 'Validating...' : '🔍 Validate Current Email'}
+            </Button>
+          </div>
+        )}
+        */}
+
+        <div className={styles.contentArea}>
+          {loading ? (
+            <div className={styles.loadingContainer}>
+              <div className={styles.spinner}></div>
+              <div className={styles.loadingText}>
+                {generatedContent === "Generating..." ? "Generating your content..." :
+                 generatedContent === "Generating email..." ? "Creating your email..." :
+                 generatedContent === "Enhancing email with missing keywords..." ? "Enhancing your email..." :
+                 generatedContent === "Validating email content..." ? "Validating your email..." :
+                 "Processing your request..."}
+              </div>
+            </div>
+          ) : (
+            <div
+              dangerouslySetInnerHTML={{
+                __html: generatedContent
+                  ? generatedContent
+                      .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>') // links clickable
+                      .replace(/\n/g, '<br>') // preserve line breaks
+                      .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>') // bold for **text**
+                      .replace(/\*(.*?)\*/g, '<i>$1</i>') // italics for *text*
+                  : '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #605e5c; font-style: italic; text-align: center; padding: 30px;"><div><div style="font-size: 16px; margin-bottom: 6px;">✨ Your generated content will appear here</div><div style="font-size: 12px; opacity: 0.8;">Click a button above to get started</div></div></div>'
+              }}
+            />
+          )}
+        </div>
+        
+        {/* Enhanced Response Button - Only show when there's generated content and enhance button is enabled */}
+        {showEnhanceButton && (
+          <div style={{
+            display: 'flex',
+            gap: '8px',
+            margin: '8px',
+            flexShrink: 0
+          }}>
+            <Button
+              appearance="primary"
+              onClick={generateEnhancedEmail}
+              disabled={loading}
+              style={{ 
+                flex: 1,
+                padding: '8px 16px',
+                fontSize: '14px',
+                fontWeight: '600',
+                borderRadius: '4px',
+                minHeight: '36px',
+                backgroundColor: '#0078d4',
+                color: '#ffffff',
+                border: 'none',
+                opacity: loading ? 0.5 : 1
+              }}
+            >
+              {loading ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  <div style={{
+                    width: '16px',
+                    height: '16px',
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    borderRadius: '50%',
+                    borderTopColor: '#ffffff',
+                    animation: 'spin 1s ease-in-out infinite'
+                  }}></div>
+                  <span>Enhancing...</span>
+                </div>
+              ) : '✨ Generate Enhanced Response'}
+            </Button>
+          </div>
+        )}
+        
         {(() => {
-          const shouldShow = (activeTab === 'suggestReply' || (activeTab === 'writeEmail' && generatedContent && !generatedContent.includes("Generating")));
+          const shouldShow = (activeTab === 'suggestReply' || (activeTab === 'writeEmail' && generatedContent && !generatedContent.includes("Generating")) /* || (activeTab === 'validate' && generatedContent && !generatedContent.includes("Validating")) */);
           console.log('Chat input should show:', shouldShow, 'activeTab:', activeTab, 'generatedContent:', generatedContent);
           return shouldShow;
         })() && (
@@ -729,18 +1239,28 @@ const App = (props) => {
                 }
               }}
             >
-              {loading ? '...' : '↑'}
+              {loading ? (
+                <div style={{
+                  width: '12px',
+                  height: '12px',
+                  border: '2px solid rgba(255,255,255,0.3)',
+                  borderRadius: '50%',
+                  borderTopColor: '#ffffff',
+                  animation: 'spin 1s ease-in-out infinite'
+                }}></div>
+              ) : '↑'}
             </button>
           </div>
         )}
       </div>
     </FluentProvider>
   );
-};
+}
 
 App.propTypes = {
   title: PropTypes.string,
 };
 
 export default App;
+
 
